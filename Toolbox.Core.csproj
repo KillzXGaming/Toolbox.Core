@@ -17,12 +17,21 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Drawing\Color\" />
+    <Compile Remove="Drawing\**" />
+    <Compile Remove="IO\**" />
+    <Compile Remove="Samples\**" />
+    <Compile Remove="Textures\**" />
+    <EmbeddedResource Remove="Drawing\**" />
+    <EmbeddedResource Remove="IO\**" />
+    <EmbeddedResource Remove="Samples\**" />
+    <EmbeddedResource Remove="Textures\**" />
+    <None Remove="Drawing\**" />
+    <None Remove="IO\**" />
+    <None Remove="Samples\**" />
+    <None Remove="Textures\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="External\" />
-    <Folder Include="IO\SyrootCommon\" />
-    <Folder Include="Textures\DDS\BCN\BC7\" />
-    <Folder Include="Textures\DDS\BCN\BC6\" />
-    <Folder Include="Textures\Gamecube\" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
