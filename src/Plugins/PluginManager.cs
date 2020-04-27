@@ -15,6 +15,9 @@ namespace Toolbox.Core
             public List<IFileFormat> FileFormats = new List<IFileFormat>();
             public List<ICompressionFormat> CompressionFormats = new List<ICompressionFormat>();
             public List<IFileEditor> FileEditors = new List<IFileEditor>();
+            public List<IExportableModel> ExportableModels = new List<IExportableModel>();
+            public List<IExportableAnimation> ExportableAnimations = new List<IExportableAnimation>();
+            public List<IExportableTexture> ExportableTextures = new List<IExportableTexture>();
 
             public IPlugin PluginHandler;
         }
