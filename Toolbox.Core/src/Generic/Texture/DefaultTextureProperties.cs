@@ -12,7 +12,7 @@ namespace Toolbox.Core
         public uint Height => texture.Height;
         public uint Depth => texture.Depth;
 
-        public string Format => $"{texture.Format}_{texture.FormatType}";
+        public string Format => $"{texture.Platform.OutputFormat}";
         public uint MipCount => texture.MipCount;
         public uint ArrayCount => texture.ArrayCount;
         public uint ImageSize => (uint)texture.DataSizeInBytes;

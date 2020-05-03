@@ -215,7 +215,7 @@ namespace Toolbox.Core
 
 
                 if (UseOpenGLDecoder)
-                    SetPixelFormats(GenericTexture.Format, GenericTexture.FormatType);
+                    SetPixelFormats(GenericTexture.Platform.OutputFormat, GenericTexture.Platform.OutputFormatType);
 
                 GLInitialized = true;
                 for (int i = 0; i < Surfaces.Count; i++)
@@ -312,7 +312,7 @@ namespace Toolbox.Core
             return STGenericTexture.DecodeBlock(imageData,
                  width,
                  height,
-                 texture.Format,
+                 texture.Platform.OutputFormat,
                  texture.GetPaletteData(),
                  texture.PaletteFormat,
                  texture.Platform);

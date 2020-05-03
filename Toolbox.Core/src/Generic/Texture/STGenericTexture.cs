@@ -242,25 +242,6 @@ namespace Toolbox.Core
             bitmap.Save(filePath);
         }
 
-        public void SaveTGA(string filePath, TextureExportSettings settings = null)
-        {
-
-        }
-
-        public void SaveASTC(string filePath, TextureExportSettings settings = null) {
-            List<Surface> surfaces = GetExportableSurfaces(settings);
-
-            ASTC atsc = new ASTC();
-            atsc.Width = Width;
-            atsc.Height = Height;
-            atsc.Depth = Depth;
-            atsc.BlockDimX = (byte)TextureFormatHelper.GetBlockWidth(Format);
-            atsc.BlockDimY = (byte)TextureFormatHelper.GetBlockHeight(Format);
-            atsc.BlockDimZ = (byte)TextureFormatHelper.GetBlockDepth(Format);
-            atsc.DataBlock = ByteUtils.CombineArray(surfaces[0].mipmaps.ToArray());
-            atsc.Save(new System.IO.FileStream(filePath, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite));
-        }
-
         public void SaveDDS(string filePath, TextureExportSettings settings = null) {
          
         }
@@ -289,8 +270,8 @@ namespace Toolbox.Core
             byte[] paletteData = GetPaletteData();
 
             data = Platform.DecodeImage(this, data, width, height, ArrayLevel, MipLevel);
-            if (!Platform.IsOuputRGBA8)
-                data = DecodeBlock(data, width, height, Format, FormatType);
+            if (Platform.OutputFormat != TexFormat.RGB8)
+                data = DecodeBlock(data, width, height, Platform.OutputFormat, Platform.OutputFormatType);
 
             return BitmapExtension.CreateBitmap(data, (int)width, (int)height);
 
@@ -348,10 +329,12 @@ namespace Toolbox.Core
 
         private int GetImageSizeDefault()
         {
+            var format = Platform.OutputFormat;
+
             int totalSize = 0;
-            if (TextureFormatHelper.HasFormatTableKey(Format))
+            if (TextureFormatHelper.HasFormatTableKey(format))
             {
-                uint bpp = TextureFormatHelper.GetBytesPerPixel(Format);
+                uint bpp = TextureFormatHelper.GetBytesPerPixel(format);
 
                 for (int arrayLevel = 0; arrayLevel < ArrayCount; arrayLevel++)
                 {
@@ -361,7 +344,7 @@ namespace Toolbox.Core
                         uint height = (uint)Math.Max(1, Height >> mipLevel);
 
                         uint size = width * height * bpp;
-                        if (TextureFormatHelper.IsBCNCompressed(Format))
+                        if (TextureFormatHelper.IsBCNCompressed(format))
                         {
                             size = ((width + 3) >> 2) * ((Height + 3) >> 2) * bpp;
                             if (size < bpp)
@@ -377,6 +360,8 @@ namespace Toolbox.Core
 
         private int GetImageSizeGCN()
         {
+            var platform = (PlatformSwizzle.GamecubeSwizzle)Platform;
+
             int totalSize = 0;
             for (int arrayLevel = 0; arrayLevel < ArrayCount; arrayLevel++)
             {
@@ -385,7 +370,7 @@ namespace Toolbox.Core
                     uint width = (uint)Math.Max(1, Width >> mipLevel);
                     uint height = (uint)Math.Max(1, Height >> mipLevel);
 
-                    totalSize += Decode_Gamecube.GetDataSize((uint)Decode_Gamecube.FromGenericFormat(Format), width, height);
+                    totalSize += Decode_Gamecube.GetDataSize((uint)platform.Format, width, height);
                 }
             }
 
@@ -394,6 +379,8 @@ namespace Toolbox.Core
 
         private int GetImageSize3DS()
         {
+            var platform = (PlatformSwizzle.CTRSwizzle)Platform;
+
             int totalSize = 0;
             for (int arrayLevel = 0; arrayLevel < ArrayCount; arrayLevel++)
             {
@@ -401,7 +388,7 @@ namespace Toolbox.Core
                 {
                     uint width = (uint)Math.Max(1, Width >> mipLevel);
                     uint height = (uint)Math.Max(1, Height >> mipLevel);
-                    totalSize += CTR_3DS.CalculateLength((int)width, (int)height, CTR_3DS.ConvertToPICAFormat(Format));
+                    totalSize += CTR_3DS.CalculateLength((int)width, (int)height, platform.Format);
                 }
             }
             return totalSize;

@@ -208,9 +208,9 @@ namespace Toolbox.Core
             dds.MainHeader.PitchOrLinearSize = (uint)surfaces[0].mipmaps[0].Length;
 
             if (surfaces.Count > 1) //Use DX10 format for array surfaces as it can do custom amounts
-                dds.SetFlags(texture.Format, true, texture.IsCubemap);
+                dds.SetFlags(Platform.OutputFormat, true, texture.IsCubemap);
             else
-                dds.SetFlags(texture.Format, false, texture.IsCubemap);
+                dds.SetFlags(Platform.OutputFormat, false, texture.IsCubemap);
 
             if (dds.IsDX10)
             {
@@ -346,11 +346,11 @@ namespace Toolbox.Core
                     case FOURCC_ATI2:
                     case FOURCC_BC5U:
                         format = TexFormat.BC5;
-                        FormatType = TexFormatType.Unorm;
+                        formatType = TexFormatType.Unorm;
                         break;
                     case FOURCC_BC5S:
                         format = TexFormat.BC5;
-                        FormatType = TexFormatType.Snorm;
+                        formatType = TexFormatType.Snorm;
                         break;
                     case FOURCC_RXGB:
                         format = TexFormat.RGBA8;
@@ -361,8 +361,8 @@ namespace Toolbox.Core
                 }
             }
 
-            Format = format;
-            FormatType = formatType;
+            Platform.OutputFormat = format;
+           // Platform.OutputFormatType = formatType;
         }
 
         public void SetFlags(TexFormat format, bool isDX10, bool isCubemap)
@@ -419,6 +419,13 @@ namespace Toolbox.Core
             return ImageData;
         }
 
+        public override void SetImageData(List<byte[]> imageData, uint width, uint height, int arrayLevel = 0)
+        {
+            Width = width;
+            Height = height;
+            ImageData = ByteUtils.CombineArray(imageData.ToArray());
+        }
+
         public void Save(Stream stream)
         {
             using (var writer = new FileWriter(stream))
@@ -432,8 +439,7 @@ namespace Toolbox.Core
             }
         }
 
-        public List<byte[]> GetImageData()
-        {
+        public List<byte[]> GetImageData() {
             return new List<byte[]>() { ImageData };
         }
     }

@@ -7,6 +7,7 @@ namespace Toolbox.Core.PlatformSwizzle
     public class CTRSwizzle : IPlatformSwizzle
     {
         public TexFormat OutputFormat { get; set; } = TexFormat.RGB8;
+        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
 
         public CTR_3DS.Orientation SwizzleMode = CTR_3DS.Orientation.Default;
         public CTR_3DS.PICASurfaceFormat Format = CTR_3DS.PICASurfaceFormat.RGB8;

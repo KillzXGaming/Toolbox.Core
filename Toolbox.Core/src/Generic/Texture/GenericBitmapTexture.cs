@@ -26,7 +26,7 @@ namespace Toolbox.Core
         public GenericBitmapTexture(byte[] FileData, int width, int height)
         {
             Name = $"bitmap_{width}x{height}";
-            Format = TexFormat.RGB8;
+            Platform.OutputFormat = TexFormat.RGB8;
             Width = (uint)width;
             Height = (uint)height;
 
@@ -64,7 +64,7 @@ namespace Toolbox.Core
                 ImageData = ImageUtility.ConvertBgraToRgba(ImageData);
             Width = (uint)bitmap.Width;
             Height = (uint)bitmap.Height;
-            Format = TexFormat.RGB8;
+            Platform.OutputFormat = TexFormat.RGB8;
             MipCount = 1;
         }
 
@@ -101,6 +101,11 @@ namespace Toolbox.Core
 
         public override byte[] GetImageData(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0) {
             return ImageData;
+        }
+
+        public override void SetImageData(List<byte[]> imageData, uint width, uint height, int arrayLevel = 0)
+        {
+            throw new NotImplementedException();
         }
     }
 }

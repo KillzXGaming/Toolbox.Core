@@ -8,7 +8,7 @@ namespace Toolbox.Core.WiiU
     {
         public static byte[] Decode(STGenericTexture texture, byte[] data, int ArrayLevel, int MipLevel)
         {
-            uint bpp = TextureFormatHelper.GetBytesPerPixel(texture.Format);
+            uint bpp = TextureFormatHelper.GetBytesPerPixel(texture.Platform.OutputFormat);
 
             GX2.GX2Surface surf = new GX2.GX2Surface();
             surf.bpp = bpp;

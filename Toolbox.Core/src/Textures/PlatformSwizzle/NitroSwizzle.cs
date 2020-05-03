@@ -7,6 +7,7 @@ namespace Toolbox.Core.PlatformSwizzle
     public class NitroSwizzle : IPlatformSwizzle
     {
         public TexFormat OutputFormat { get; set; } = TexFormat.RGB8;
+        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
 
         public bool isColor0 = true;
 

@@ -7,6 +7,7 @@ namespace Toolbox.Core.PlatformSwizzle
     public class GamecubeSwizzle : IPlatformSwizzle
     {
         public TexFormat OutputFormat { get; set; } = TexFormat.RGB8;
+        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
 
         public Decode_Gamecube.TextureFormats Format = Decode_Gamecube.TextureFormats.RGBA32;
         public Decode_Gamecube.PaletteFormats PaletteFormat = Decode_Gamecube.PaletteFormats.RGB565;

@@ -10,13 +10,13 @@
 
   <ItemGroup>
     <Reference Include="OpenTK">
-      <HintPath>..\..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\OpenTK.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.BinaryData">
-      <HintPath>..\..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\Syroot.BinaryData.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\Syroot.BinaryData.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.Maths">
-      <HintPath>..\..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\Syroot.Maths.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\Syroot.Maths.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -7,8 +7,9 @@ namespace Toolbox.Core.Switch
     {
         public static byte[] GetImageData(STGenericTexture texture, byte[] ImageData, int ArrayLevel, int MipLevel, int DepthLevel, int target = 1, bool LinearTileMode = false)
         {
-            uint blkHeight = TextureFormatHelper.GetBlockHeight(texture.Format);
-            uint blkDepth = TextureFormatHelper.GetBlockDepth(texture.Format);
+            var format = texture.Platform.OutputFormat;
+            uint blkHeight = TextureFormatHelper.GetBlockHeight(format);
+            uint blkDepth = TextureFormatHelper.GetBlockDepth(format);
             uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(texture.Height, blkHeight));
             uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
             return GetImageData(texture, ImageData, ArrayLevel, MipLevel, DepthLevel, BlockHeightLog2, target, LinearTileMode);
@@ -16,10 +17,11 @@ namespace Toolbox.Core.Switch
 
         public static byte[] GetImageData(STGenericTexture texture, byte[] ImageData, int ArrayLevel, int MipLevel, int DepthLevel, uint BlockHeightLog2, int target = 1, bool LinearTileMode = false)
         {
-            uint bpp = TextureFormatHelper.GetBytesPerPixel(texture.Format);
-            uint blkWidth = TextureFormatHelper.GetBlockWidth(texture.Format);
-            uint blkHeight = TextureFormatHelper.GetBlockHeight(texture.Format);
-            uint blkDepth = TextureFormatHelper.GetBlockDepth(texture.Format);
+            var format = texture.Platform.OutputFormat;
+            uint bpp = TextureFormatHelper.GetBytesPerPixel(format);
+            uint blkWidth = TextureFormatHelper.GetBlockWidth(format);
+            uint blkHeight = TextureFormatHelper.GetBlockHeight(format);
+            uint blkDepth = TextureFormatHelper.GetBlockDepth(format);
             uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(texture.Height, blkHeight));
 
             uint Pitch = 0;

@@ -14,7 +14,7 @@ namespace Toolbox.Core.PlatformSwizzle
         /// <summary>
         /// The <see cref="TexFormatType"/> type of the image. 
         /// </summary>
-        public TexFormatType FormatType { get; set; } = TexFormatType.Unorm;
+        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
 
         public bool IsOuputRGBA8 => false;
 

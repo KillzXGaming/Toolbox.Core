@@ -7,6 +7,7 @@ namespace Toolbox.Core.PlatformSwizzle
     public class SwitchSwizzle : IPlatformSwizzle
     {
         public TexFormat OutputFormat { get; set; } = TexFormat.RGB8;
+        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
 
         public int Target = 1; //Default or linear
 

@@ -8,6 +8,7 @@ namespace Toolbox.Core.PlatformSwizzle
     public class WiiUSwizzle : IPlatformSwizzle
     {
         public TexFormat OutputFormat { get; set; } = TexFormat.RGB8;
+        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
 
         public GX2.GX2AAMode AAMode { get; set; }
         public GX2.GX2TileMode TileMode { get; set; }
