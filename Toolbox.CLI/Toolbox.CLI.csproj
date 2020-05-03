@@ -6,19 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Toolbox.Core-master\Samples\PluginSample\PluginSample.csproj" />
-    <ProjectReference Include="..\Toolbox.Core-master\Toolbox.Core.csproj" />
+    <ProjectReference Include="..\Toolbox.Core\Toolbox.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="OpenTK">
-      <HintPath>..\Toolbox.Core-master\External\Framework\OpenTK.dll</HintPath>
+      <HintPath>..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.BinaryData">
-      <HintPath>..\Toolbox.Core-master\External\Framework\Syroot.BinaryData.dll</HintPath>
+      <HintPath>..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\Syroot.BinaryData.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.Maths">
-      <HintPath>..\Toolbox.Core-master\External\Framework\Syroot.Maths.dll</HintPath>
+      <HintPath>..\..\..\..\..\source\repos\ToolboxReborn\Toolbox.Core\External\Framework\Syroot.Maths.dll</HintPath>
     </Reference>
   </ItemGroup>
 

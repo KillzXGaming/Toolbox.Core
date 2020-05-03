@@ -21,10 +21,6 @@ namespace Toolbox.CLI
                     Console.WriteLine($"file {file.Extension[0]}");
             }
 
-            ExportImage("type_icon_00_normal.bflim");
-            ExportImage("ParamName_00.bflim");
-            ExportImage("sick_icon_01_mahi.bflim");
-
             Console.Read();
         }
 
@@ -33,7 +29,9 @@ namespace Toolbox.CLI
             var bflim = STFileLoader.OpenFileFormat(fileName) as STGenericTexture;
             if (bflim == null) return;
 
-            Console.WriteLine($"tex {bflim.Name} {bflim.Format} {bflim.Width} {bflim.Height}");
+            var swizzle = bflim.Platform as Toolbox.Core.PlatformSwizzle.CTRSwizzle;
+
+            Console.WriteLine($"tex {bflim.Name} {swizzle.Format} {swizzle.SwizzleMode} {bflim.Width} {bflim.Height}");
             bflim.GetBitmap().Save($"{bflim.Name}.png");
         }
     }
