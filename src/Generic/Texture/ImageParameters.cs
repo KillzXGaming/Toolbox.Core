@@ -8,6 +8,8 @@ namespace Toolbox.Core
 {
     public class ImageParameters
     {
+        public STRotateFlipType Rotation;
+
         //Flip the image on the Y axis
         public bool FlipY { get; set; }
 

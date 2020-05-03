@@ -5,9 +5,9 @@ using System.IO;
 
 namespace Toolbox.Core.Animations
 {
-    public class SMD
+    public class SMD : IExportableSkeletalAnimation
     {
-        public static void Export(string filePath, STAnimation animation, STSkeleton skeleton)
+        public void Export(STAnimation animation, STSkeleton skeleton, string filePath)
         {
             if (skeleton == null) return;
 

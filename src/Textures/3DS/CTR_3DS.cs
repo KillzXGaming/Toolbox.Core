@@ -12,6 +12,13 @@ namespace Toolbox.Core
     {
         //From https://github.com/gdkchan/SPICA/blob/42c4181e198b0fd34f0a567345ee7e75b54cb58b/SPICA/PICA/Converters/TextureConverter.cs
 
+        public enum Orientation
+        {
+            Default = 0,
+            Rotate90 = 4,
+            Transpose = 8,
+        }
+
         public enum PICASurfaceFormat
         {
             RGBA8,
@@ -101,8 +108,47 @@ namespace Toolbox.Core
             return DecodeBlock(Input, Width, Height, ConvertToPICAFormat(Format));
         }
 
-        public static byte[] DecodeBlock(byte[] Input, int Width, int Height, PICASurfaceFormat picaFormat)
+        public static int Morton7(int value)
         {
+            return ((value >> 2) & 0x04) | ((value >> 1) & 0x02) | (value & 0x01);
+        }
+
+        public static byte[] DecodeTiled(int width, int height)
+        {
+            byte[] output = new byte[width * height * 4];
+            int stride = width;
+
+            for (int TY = 0; TY < height; TY += 8)
+            {
+                for (int TX = 0; TX < width; TX += 8)
+                {
+                    for (int i = 0; i < 0x40; i++)
+                    {
+                        int x = Morton7(i);
+                        int y = Morton7(i >> 1);
+                        int dstOffs = ((TY + y) * stride + TX + x) * 4;
+
+                    }
+                }
+            }
+
+            return output;
+        }
+
+        static byte Convert4To8(int value)
+        {
+            return (byte)((value << 4) | value);
+        }
+
+        public class SwizzleSettings
+        {
+            public Orientation Orientation = Orientation.Default;
+        }
+
+        public static byte[] DecodeBlock(byte[] Input, int Width, int Height, PICASurfaceFormat picaFormat, SwizzleSettings settings = null)
+        {
+            if (settings == null) settings = new SwizzleSettings();
+
             if (picaFormat == PICASurfaceFormat.ETC1 || picaFormat == PICASurfaceFormat.ETC1A4)
                 return FlipVertical(Width, Height, ETC1.ETC1Decompress(Input, Width, Height, picaFormat == PICASurfaceFormat.ETC1A4));
 
@@ -111,6 +157,10 @@ namespace Toolbox.Core
             int Increment = FmtBPP[(int)picaFormat] / 8;
             if (Increment == 0) Increment = 1;
 
+            Console.WriteLine($"Increment {Increment} Input {Input.Length} {Width} {Height} {picaFormat}");
+
+            int stride = Width;
+
             int IOffset = 0;
             for (int TY = 0; TY < Height; TY += 8)
             {
@@ -118,86 +168,148 @@ namespace Toolbox.Core
                 {
                     for (int Px = 0; Px < 64; Px++)
                     {
-                        int X = SwizzleLUT[Px] & 7;
-                        int Y = (SwizzleLUT[Px] - X) >> 3;
+                        int X = Morton7(Px);
+                        int Y = Morton7(Px >> 1);
+                        int OOffet = ((TY + Y) * stride + TX + X) * 4;
+                        if (OOffet + 4 >= Output.Length)
+                            break;
 
-                        int OOffet = (TX + X + ((Height - 1 - (TY + Y)) * Width)) * 4;
-
-                        switch (picaFormat)
+                        if (settings.Orientation == Orientation.Rotate90)
                         {
-                            case PICASurfaceFormat.RGBA8:
-                                Output[OOffet + 0] = Input[IOffset + 3];
-                                Output[OOffet + 1] = Input[IOffset + 2];
-                                Output[OOffet + 2] = Input[IOffset + 1];
-                                Output[OOffet + 3] = Input[IOffset + 0];
-                                break;
-                            case PICASurfaceFormat.RGB8:
-                                Output[OOffet + 0] = Input[IOffset + 2];
-                                Output[OOffet + 1] = Input[IOffset + 1];
-                                Output[OOffet + 2] = Input[IOffset + 0];
-                                Output[OOffet + 3] = 0xff;
-                                break;
-                            case PICASurfaceFormat.RGBA5551:
-                                DecodeRGBA5551(Output, OOffet, GetUShort(Input, IOffset));
-                                break;
-                            case PICASurfaceFormat.RGB565:
-                                DecodeRGB565(Output, OOffet, GetUShort(Input, IOffset));
-                                break;
-                            case PICASurfaceFormat.RGBA4:
-                                DecodeRGBA4(Output, OOffet, GetUShort(Input, IOffset));
-                                break;
-                            case PICASurfaceFormat.LA8:
-                                Output[OOffet + 0] = Input[IOffset + 1];
-                                Output[OOffet + 1] = Input[IOffset + 1];
-                                Output[OOffet + 2] = Input[IOffset + 1];
-                                Output[OOffet + 3] = Input[IOffset + 0];
-                                break;
-                            case PICASurfaceFormat.HiLo8:
-                                Output[OOffet + 0] = Input[IOffset + 1];
-                                Output[OOffet + 1] = Input[IOffset + 0];
-                                Output[OOffet + 2] = 0;
-                                Output[OOffet + 3] = 0xff;
-                                break;
-                            case PICASurfaceFormat.L8:
-                                Output[OOffet + 0] = Input[IOffset];
-                                Output[OOffet + 1] = Input[IOffset];
-                                Output[OOffet + 2] = Input[IOffset];
-                                Output[OOffet + 3] = 0xff;
-                                break;
-                            case PICASurfaceFormat.A8:
-                                Output[OOffet + 0] = 0xff;
-                                Output[OOffet + 1] = 0xff;
-                                Output[OOffet + 2] = 0xff;
-                                Output[OOffet + 3] = Input[IOffset];
-                                break;
-                            case PICASurfaceFormat.LA4:
-                                Output[OOffet + 0] = (byte)((Input[IOffset] >> 4) | (Input[IOffset] & 0xf0));
-                                Output[OOffet + 1] = (byte)((Input[IOffset] >> 4) | (Input[IOffset] & 0xf0));
-                                Output[OOffet + 2] = (byte)((Input[IOffset] >> 4) | (Input[IOffset] & 0xf0));
-                                Output[OOffet + 3] = (byte)((Input[IOffset] << 4) | (Input[IOffset] & 0x0f));
-                                break;
-                            case PICASurfaceFormat.L4:
-                                int L = (Input[IOffset >> 1] >> ((IOffset & 1) << 2)) & 0xf;
-                                Output[OOffet + 0] = (byte)((L << 4) | L);
-                                Output[OOffet + 1] = (byte)((L << 4) | L);
-                                Output[OOffet + 2] = (byte)((L << 4) | L);
-                                Output[OOffet + 3] = 0xff;
-                                break;
-                            case PICASurfaceFormat.A4:
-                                int A = (Input[IOffset >> 1] >> ((IOffset & 1) << 2)) & 0xf;
-                                Output[OOffet + 0] = 0xff;
-                                Output[OOffet + 1] = 0xff;
-                                Output[OOffet + 2] = 0xff;
-                                Output[OOffet + 3] = (byte)((A << 4) | A);
-                                break;
+
                         }
 
+                        DecodeFormat(Output, Input, OOffet, IOffset, picaFormat);
+                        IOffset += Increment;
+                    }
+                }
+            }
+
+            int tile_width = (int)Math.Ceiling(Width / 8.0f);
+            int tile_height = (int)Math.Ceiling(Height / 8.0f);
+
+            stride = Width;
+            IOffset = 0;
+            for (int TY = 0; TY < tile_width; TY += 8) {
+                for (int TX = 0; TX < tile_height; TX += 8) {
+                    for (int x = 0; x < 2; x++) {
+                        for (int y = 0; y < 2; y++) {
+                            for (int x2 = 0; x2 < 2; x2++)
+                            {
+                                for (int y2 = 0; y2 < 2; y2++)
+                                {
+                                    for (int x3 = 0; x3< 2; x3++)
+                                    {
+                                        for (int y3 = 0; y3 < 2; y3++)
+                                        {
+                                            var pixel_x = (x3 + (x2 * 2) + (x * 4) + (TX * 8));
+                                            var pixel_y = (y3 + (y2 * 2) + (y * 4) + (TY * 8));
+
+                                            if (pixel_y >= Height || pixel_y >= Height)
+                                                continue;
+                                            // same for the x and the input data width
+                                            if (pixel_x >= Width || pixel_x >= Width)
+                                                continue;
+
+
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    for (int Px = 0; Px < 64; Px++)
+                    {
+                        int X = Morton7(Px);
+                        int Y = Morton7(Px >> 1);
+                        int OOffet = ((TY + Y) * stride + TX + X) * 4;
+                        if (OOffet + 4 >= Output.Length)
+                            break;
+
+                        DecodeFormat(Output, Input, OOffet, IOffset, picaFormat);
                         IOffset += Increment;
                     }
                 }
             }
 
             return FlipVertical(Width, Height, Output);
+        }
+
+        private static void DecodeFormat(byte[] Output, byte[] Input, int OOffet, int IOffset, PICASurfaceFormat picaFormat)
+        {
+            switch (picaFormat)
+            {
+                case PICASurfaceFormat.RGBA8:
+                    Output[OOffet + 0] = Input[IOffset + 3];
+                    Output[OOffet + 1] = Input[IOffset + 2];
+                    Output[OOffet + 2] = Input[IOffset + 1];
+                    Output[OOffet + 3] = Input[IOffset + 0];
+                    break;
+                case PICASurfaceFormat.RGB8:
+                    Output[OOffet + 0] = Input[IOffset + 2];
+                    Output[OOffet + 1] = Input[IOffset + 1];
+                    Output[OOffet + 2] = Input[IOffset + 0];
+                    Output[OOffet + 3] = 0xff;
+                    break;
+                case PICASurfaceFormat.RGBA5551:
+                    DecodeRGBA5551(Output, OOffet, GetUShort(Input, IOffset));
+                    break;
+                case PICASurfaceFormat.RGB565:
+                    DecodeRGB565(Output, OOffet, GetUShort(Input, IOffset));
+                    break;
+                case PICASurfaceFormat.RGBA4:
+                    DecodeRGBA4(Output, OOffet, GetUShort(Input, IOffset));
+                    break;
+                case PICASurfaceFormat.LA8:
+                    Output[OOffet + 0] = Input[IOffset + 1];
+                    Output[OOffet + 1] = Input[IOffset + 1];
+                    Output[OOffet + 2] = Input[IOffset + 1];
+                    Output[OOffet + 3] = Input[IOffset + 0];
+                    break;
+                case PICASurfaceFormat.HiLo8:
+                    Output[OOffet + 0] = Input[IOffset + 1];
+                    Output[OOffet + 1] = Input[IOffset + 0];
+                    Output[OOffet + 2] = 0;
+                    Output[OOffet + 3] = 0xff;
+                    break;
+                case PICASurfaceFormat.L8:
+                    Output[OOffet + 0] = Input[IOffset];
+                    Output[OOffet + 1] = Input[IOffset];
+                    Output[OOffet + 2] = Input[IOffset];
+                    Output[OOffet + 3] = 0xff;
+                    break;
+                case PICASurfaceFormat.A8:
+                    Output[OOffet + 0] = 0xff;
+                    Output[OOffet + 1] = 0xff;
+                    Output[OOffet + 2] = 0xff;
+                    Output[OOffet + 3] = Input[IOffset];
+                    break;
+                case PICASurfaceFormat.LA4:
+                    byte val = Convert4To8((Input[IOffset] & 0xF0) >> 4);
+                    byte a = Convert4To8((Input[IOffset] & 0x0F));
+
+                    Output[OOffet + 0] = val;
+                    Output[OOffet + 1] = val;
+                    Output[OOffet + 2] = val;
+                    Output[OOffet + 3] = a;
+                    break;
+                case PICASurfaceFormat.L4:
+                    int L = (Input[IOffset >> 1] >> ((IOffset & 1) << 2)) & 0xf;
+                    Output[OOffet + 0] = (byte)((L << 4) | L);
+                    Output[OOffet + 1] = (byte)((L << 4) | L);
+                    Output[OOffet + 2] = (byte)((L << 4) | L);
+                    Output[OOffet + 3] = 0xff;
+                    break;
+                case PICASurfaceFormat.A4:
+                    int A = (Input[IOffset >> 1] >> ((IOffset & 1) << 2)) & 0xf;
+                    Output[OOffet + 0] = 0xff;
+                    Output[OOffet + 1] = 0xff;
+                    Output[OOffet + 2] = 0xff;
+                    Output[OOffet + 3] = (byte)((A << 4) | A);
+                    break;
+            }
         }
 
         private static byte[] FlipVertical(int Width, int Height, byte[] Input)
@@ -253,6 +365,7 @@ namespace Toolbox.Core
                             int Y = (SwizzleLUT[Px] - X) >> 3;
 
                             int IOffs = (TX + X + ((TY + Y) * Width)) * 4;
+
                             if (PicaFormat == PICASurfaceFormat.RGBA8)
                             {
                                 writer.Write(Input[IOffs + 3]);

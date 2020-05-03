@@ -206,8 +206,8 @@ namespace Toolbox.Core
                 pixelInternalFormat = PixelInternalFormat.Rgba;
                 pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
 
-                if (GenericTexture.PlatformSwizzle == PlatformSwizzle.Platform_3DS ||
-                    GenericTexture.PlatformSwizzle == PlatformSwizzle.Platform_Gamecube)
+                if (GenericTexture.Platform is PlatformSwizzle.CTRSwizzle ||
+                    GenericTexture.Platform is PlatformSwizzle.GamecubeSwizzle)
                 {
                     UseOpenGLDecoder = false;
                     pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
@@ -315,7 +315,7 @@ namespace Toolbox.Core
                  texture.Format,
                  texture.GetPaletteData(),
                  texture.PaletteFormat,
-                 texture.PlatformSwizzle);
+                 texture.Platform);
         }
 
         public static int GenerateOpenGLTexture(RenderableTex t, Bitmap bitmap, bool generateMips = false)

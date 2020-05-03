@@ -47,11 +47,6 @@ namespace Toolbox.Core
         public STSurfaceType SurfaceType = STSurfaceType.Texture2D;
 
         /// <summary>
-        /// The swizzle method to use when decoding or encoding back a texture.
-        /// </summary>
-        public PlatformSwizzle PlatformSwizzle;
-
-        /// <summary>
         /// Is the texture edited or not. Used for the image editor for saving changes.
         /// </summary>
         public bool IsEdited { get; set; } = false;
@@ -94,16 +89,6 @@ namespace Toolbox.Core
         }
 
         /// <summary>
-        /// The <see cref="TexFormat"/> format of the image. 
-        /// </summary>
-        public TexFormat Format { get; set; } = TexFormat.RGB8;
-
-        /// <summary>
-        /// The <see cref="TexFormatType"/> type of the image. 
-        /// </summary>
-        public TexFormatType FormatType { get; set; } = TexFormatType.Unorm;
-
-        /// <summary>
         /// The <see cref="PaletteFormat"/> which controls palette information.
         /// </summary>
         public PaletteFormat PaletteFormat { get; set; } = PaletteFormat.None;
@@ -117,6 +102,11 @@ namespace Toolbox.Core
         /// Parameters on how to replace and save back the texture.
         /// </summary>
         public ImageParameters Parameters = new ImageParameters();
+
+        /// <summary>
+        /// The swizzle method to use when decoding or encoding back a texture.
+        /// </summary>
+        public IPlatformSwizzle Platform = new PlatformSwizzle.DefaultSwizzle();
 
         /// <summary>
         /// Gets the image size from bytes into a string format.
@@ -159,6 +149,8 @@ namespace Toolbox.Core
                 return SurfaceType == STSurfaceType.TextureCube || 
                     SurfaceType == STSurfaceType.TextureCube_Array; }
         }
+
+        public abstract void SetImageData(List<byte[]> imageData, uint width, uint height, int arrayLevel = 0);
 
         public abstract byte[] GetImageData(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0);
 
@@ -225,8 +217,7 @@ namespace Toolbox.Core
                 if (!IsLower && !IsHigher)
                 {
                     List<byte[]> mips = new List<byte[]>();
-                    for (int mipLevel = 0; mipLevel < MipCount; mipLevel++)
-                    {
+                    for (int mipLevel = 0; mipLevel < MipCount; mipLevel++) {
                         mips.Add(GetImageData(arrayLevel, mipLevel));
                     }
 
@@ -235,6 +226,14 @@ namespace Toolbox.Core
             }
 
             return surfaces;
+        }
+
+        public void Export(string filePath, TextureExportSettings settings)
+        {
+            foreach (var format in FileManager.GetExportableTextures())
+            {
+
+            }
         }
 
         public void SaveBitmap(string filePath, TextureExportSettings settings = null)
@@ -263,31 +262,7 @@ namespace Toolbox.Core
         }
 
         public void SaveDDS(string filePath, TextureExportSettings settings = null) {
-            List<Surface> surfaces = GetExportableSurfaces(settings);
-
-            DDS dds = new DDS();
-            dds.MainHeader = new DDS.Header();
-            dds.MainHeader.Width = Width;
-            dds.MainHeader.Height = Height;
-            dds.MainHeader.Depth = Depth;
-            dds.MainHeader.MipCount = (uint)MipCount;
-            dds.MainHeader.PitchOrLinearSize = (uint)surfaces[0].mipmaps[0].Length;
-
-            if (surfaces.Count > 1) //Use DX10 format for array surfaces as it can do custom amounts
-                dds.SetFlags(Format, true, IsCubemap);
-            else
-                dds.SetFlags(Format, false, IsCubemap);
-
-            if (dds.IsDX10) {
-                if (dds.Dx10Header == null)
-                    dds.Dx10Header = new DDS.DX10Header();
-                dds.Dx10Header.ResourceDim = 3;
-                if (IsCubemap)
-                    dds.Dx10Header.ArrayCount = (uint)(ArrayCount / 6);
-                else
-                    dds.Dx10Header.ArrayCount = (uint)ArrayCount;
-            }
-            dds.Save(filePath, surfaces);
+         
         }
 
         private List<Surface> GetExportableSurfaces(TextureExportSettings settings)
@@ -313,32 +288,21 @@ namespace Toolbox.Core
             byte[] data = GetImageData(ArrayLevel, MipLevel, DepthLevel);
             byte[] paletteData = GetPaletteData();
 
-            if (PlatformSwizzle == PlatformSwizzle.Platform_Gamecube || 
-                PlatformSwizzle == PlatformSwizzle.Platform_Wii)
-            {
-                return BitmapExtension.CreateBitmap(Decode_Gamecube.DecodeData(data, paletteData, width, height, Format, PaletteFormat),
-                      (int)width, (int)height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            }
-            else  if (PlatformSwizzle == PlatformSwizzle.Platform_Gamecube)
-                return CTR_3DS.DecodeBlockToBitmap(data, (int)width, (int)height, CTR_3DS.ConvertToPICAFormat(Format));
+            data = Platform.DecodeImage(this, data, width, height, ArrayLevel, MipLevel);
+            if (!Platform.IsOuputRGBA8)
+                data = DecodeBlock(data, width, height, Format, FormatType);
 
-            //Platforms after these will be decoded after deswizzled as they output as compressed data
-            if (PlatformSwizzle == PlatformSwizzle.Platform_Switch)
-                data = Switch.TegraX1Swizzle.GetImageData(this, data, ArrayLevel, MipLevel, DepthLevel, 1, false);
-
-            data = DecodeBlock(data, width, height, Format, FormatType);
             return BitmapExtension.CreateBitmap(data, (int)width, (int)height);
 
             return null;
         }
 
         public static byte[] DecodeBlock(byte[] data, uint width, uint height, TexFormat format,
-            byte[] paletteData, PaletteFormat paletteFormat, PlatformSwizzle platform)
+            byte[] paletteData, PaletteFormat paletteFormat, IPlatformSwizzle platform)
         {
             byte[] output = data;
 
-            if (platform == PlatformSwizzle.Platform_Gamecube ||
-                platform == PlatformSwizzle.Platform_Wii)
+            if (platform is PlatformSwizzle.GamecubeSwizzle)
             {
                 output = Decode_Gamecube.DecodeData(data, paletteData, width, height, format, paletteFormat);
             }
@@ -373,9 +337,9 @@ namespace Toolbox.Core
         {
             get
             {
-                if (PlatformSwizzle == PlatformSwizzle.Platform_3DS)
+                if (Platform is PlatformSwizzle.CTRSwizzle)
                     return GetImageSize3DS();
-                if (PlatformSwizzle == PlatformSwizzle.Platform_Gamecube)
+                if (Platform is PlatformSwizzle.GamecubeSwizzle)
                     return GetImageSizeGCN();
                 else
                     return GetImageSizeDefault();

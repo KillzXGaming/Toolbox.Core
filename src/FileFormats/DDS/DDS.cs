@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Toolbox.Core
 {
-    public class DDS : STGenericTexture, IFileFormat
+    public class DDS : STGenericTexture, IFileFormat, IExportableTexture
     {
         public bool CanSave { get; set; } = true;
 
@@ -193,6 +193,36 @@ namespace Toolbox.Core
             MainHeader.Width = width;
             MainHeader.Height = height;
             MainHeader.Depth = depth;
+        }
+
+        public void Export(STGenericTexture texture, TextureExportSettings settings, string filePath)
+        {
+            List<Surface> surfaces = texture.GetSurfaces(settings.ArrayLevel, settings.ExportArrays);
+
+            DDS dds = new DDS();
+            dds.MainHeader = new DDS.Header();
+            dds.MainHeader.Width = texture.Width;
+            dds.MainHeader.Height = texture.Height;
+            dds.MainHeader.Depth = texture.Depth;
+            dds.MainHeader.MipCount = (uint)texture.MipCount;
+            dds.MainHeader.PitchOrLinearSize = (uint)surfaces[0].mipmaps[0].Length;
+
+            if (surfaces.Count > 1) //Use DX10 format for array surfaces as it can do custom amounts
+                dds.SetFlags(texture.Format, true, texture.IsCubemap);
+            else
+                dds.SetFlags(texture.Format, false, texture.IsCubemap);
+
+            if (dds.IsDX10)
+            {
+                if (dds.Dx10Header == null)
+                    dds.Dx10Header = new DDS.DX10Header();
+                dds.Dx10Header.ResourceDim = 3;
+                if (texture.IsCubemap)
+                    dds.Dx10Header.ArrayCount = (uint)(texture.ArrayCount / 6);
+                else
+                    dds.Dx10Header.ArrayCount = (uint)texture.ArrayCount;
+            }
+            dds.Save(filePath, surfaces);
         }
 
         public DDS(string fileName) { Load(fileName); }

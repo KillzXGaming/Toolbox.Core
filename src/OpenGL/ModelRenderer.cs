@@ -68,6 +68,17 @@ namespace Toolbox.Core.OpenGL
             STGenericMesh mesh,  STPolygonGroup group, STGenericMaterial material)
         {
             SetDefaultUniforms(shader);
+
+            int textureUintID = 1;
+            foreach (var textureMap in material.TextureMaps)
+            {
+                var tex = textureMap.GetTexture();
+                if (textureMap.Type == STTextureType.Diffuse) {
+                    shader.SetBoolToInt("hasDiffuse", true);
+                }
+
+                textureUintID++;
+            }
         }
 
         public virtual void OnMeshDraw(MeshRender msh, STPolygonGroup group)

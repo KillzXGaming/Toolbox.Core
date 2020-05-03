@@ -5,7 +5,7 @@ using Toolbox.Core.IO;
 
 namespace Toolbox.Core
 {
-    public class ASTC : STGenericTexture, IFileFormat
+    public class ASTC : STGenericTexture, IFileFormat, IExportableTexture
     {
         const int MagicFileConstant = 0x5CA1AB13;
 
@@ -128,6 +128,21 @@ namespace Toolbox.Core
             newValue[1] = (byte)((value >> 8) & 0xFF);
             newValue[2] = (byte)((value >> 16) & 0xFF);
             return newValue;
+        }
+
+        public void Export(STGenericTexture texture, TextureExportSettings settings, string filePath)
+        {
+            List<Surface> surfaces = texture.GetSurfaces(settings.ArrayLevel, settings.ExportArrays);
+
+            ASTC atsc = new ASTC();
+            atsc.Width = texture.Width;
+            atsc.Height = texture.Height;
+            atsc.Depth = texture.Depth;
+            atsc.BlockDimX = (byte)TextureFormatHelper.GetBlockWidth(texture.Format);
+            atsc.BlockDimY = (byte)TextureFormatHelper.GetBlockHeight(texture.Format);
+            atsc.BlockDimZ = (byte)TextureFormatHelper.GetBlockDepth(texture.Format);
+            atsc.DataBlock = ByteUtils.CombineArray(surfaces[0].mipmaps.ToArray());
+            atsc.Save(new System.IO.FileStream(filePath, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite));
         }
 
         public override byte[] GetImageData(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0) {

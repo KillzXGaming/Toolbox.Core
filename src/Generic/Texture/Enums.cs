@@ -13,6 +13,15 @@ namespace Toolbox.Core
         Fast
     }
 
+    public enum STRotateFlipType
+    {
+        Rotate90,
+        Rotate180,
+        Rotate270,
+        FlipX,
+        FlipY,
+    }
+
     public enum STChannelType
     {
         Red = 0,
@@ -21,20 +30,6 @@ namespace Toolbox.Core
         Alpha = 3,
         One = 4,
         Zero = 5,
-    }
-
-    public enum PlatformSwizzle
-    {
-        None = 0,
-        Platform_3DS = 1,
-        Platform_Wii = 2,
-        Platform_Gamecube = 3,
-        Platform_WiiU = 4,
-        Platform_Switch = 5,
-        Platform_Ps4 = 6,
-        Platform_Ps3 = 7,
-        Platform_Ps2 = 8,
-        Platform_Ps1 = 9,
     }
 
     public enum STSurfaceType

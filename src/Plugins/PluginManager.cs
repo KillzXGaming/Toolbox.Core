@@ -28,16 +28,17 @@ namespace Toolbox.Core
          //       return Plugins;
 
             List<PluginInstance> PluginList = new List<PluginInstance>();
-            var mainLibrary = SearchMainAssembly();
-            PluginList.Add(mainLibrary);
+            //var mainLibrary = SearchMainAssembly();
+           // PluginList.Add(mainLibrary);
 
             string path = Path.Combine(Runtime.ExecutableDir, "Plugins");
 
             List<string> dllFileNames = new List<string>();
+            dllFileNames.Add(Path.Combine(Runtime.ExecutableDir, "Toolbox.Core.dll"));
             if (Directory.Exists(path))
             {
-                if (Directory.Exists($"{path}/net46"))
-                    dllFileNames.AddRange(Directory.GetFiles($"{path}/net46", "*.dll"));
+                foreach (var dir in Directory.GetDirectories(path))
+                    dllFileNames.AddRange(Directory.GetFiles($"{dir}", "*.dll"));
 
                 dllFileNames.AddRange(Directory.GetFiles(path, "*.dll"));
 
@@ -47,7 +48,7 @@ namespace Toolbox.Core
             }
 
             List<string> loadedLibs = new List<string>();
-
+            
             ICollection<Assembly> assemblies = new List<Assembly>(dllFileNames.Count);
             foreach (string dllFile in dllFileNames)
             {

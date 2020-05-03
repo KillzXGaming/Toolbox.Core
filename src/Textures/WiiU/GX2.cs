@@ -40,8 +40,6 @@ namespace Toolbox.Core.WiiU
             public byte[] data;
             public byte[] mipData;
 
-
-
             public uint[] mipOffset;
             public byte[] compSel;
             public uint[] texRegs;

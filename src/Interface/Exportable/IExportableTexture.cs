@@ -6,6 +6,6 @@ namespace Toolbox.Core
 {
     public interface IExportableTexture
     {
-        void Export(STGenericTexture texture, string filePath);
+        void Export(STGenericTexture texture, TextureExportSettings settings, string filePath);
     }
 }
