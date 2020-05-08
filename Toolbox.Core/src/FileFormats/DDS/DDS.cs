@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using Toolbox.Core.IO;
 using System.Runtime.InteropServices;
+using Toolbox.Core.Imaging;
+using Toolbox.Core.DXGI;
 
 namespace Toolbox.Core
 {
@@ -229,140 +231,45 @@ namespace Toolbox.Core
 
         public void ToGenericFormat()
         {
-            TexFormatType formatType = TexFormatType.Unorm;
-            TexFormat format = TexFormat.RGB8;
+            TexFormat format = TexFormat.RGBA8_UNORM;
 
             if (IsDX10)
-            {
-                DXGI_FORMAT dxgiFormat = (DXGI_FORMAT)Dx10Header.DxgiFormat;
-                string ddsformat = dxgiFormat.ToString();
-
-                if (ddsformat.Contains("SRGB"))
-                    formatType = TexFormatType.Srgb;
-                if (ddsformat.Contains("SNORM"))
-                    formatType = TexFormatType.Snorm;
-                if (ddsformat.Contains("UF16"))
-                    formatType = TexFormatType.UnsignedFloat;
-                if (ddsformat.Contains("SF16"))
-                    formatType = TexFormatType.SignedFloat;
-                if (ddsformat.Contains("SINT"))
-                    formatType = TexFormatType.SInt;
-                if (ddsformat.Contains("UINT"))
-                    formatType = TexFormatType.UInt;
-
-                if (ddsformat.Contains("ASTC_4x4"))
-                    format = TexFormat.ASTC_4x4;
-                if (ddsformat.Contains("ASTC_5x4"))
-                    format = TexFormat.ASTC_5x4;
-                if (ddsformat.Contains("ASTC_5x4"))
-                    format = TexFormat.ASTC_5x4;
-                if (ddsformat.Contains("ASTC_5x5"))
-                    format = TexFormat.ASTC_5x5;
-                if (ddsformat.Contains("ASTC_6x5"))
-                    format = TexFormat.ASTC_6x5;
-                if (ddsformat.Contains("ASTC_6x6"))
-                    format = TexFormat.ASTC_6x6;
-                if (ddsformat.Contains("ASTC_8x5"))
-                    format = TexFormat.ASTC_8x5;
-                if (ddsformat.Contains("ASTC_8x6"))
-                    format = TexFormat.ASTC_8x6;
-                if (ddsformat.Contains("ASTC_8x8"))
-                    format = TexFormat.ASTC_8x8;
-                if (ddsformat.Contains("ASTC_8x6"))
-                    format = TexFormat.ASTC_8x6;
-                if (ddsformat.Contains("ASTC_10X10"))
-                    format = TexFormat.ASTC_10x10;
-                if (ddsformat.Contains("ASTC_10x5"))
-                    format = TexFormat.ASTC_10x5;
-                if (ddsformat.Contains("ASTC_10x6"))
-                    format = TexFormat.ASTC_10x6;
-                if (ddsformat.Contains("ASTC_10x8"))
-                    format = TexFormat.ASTC_10x8;
-                if (ddsformat.Contains("ASTC_12x10"))
-                    format = TexFormat.ASTC_12x10;
-                if (ddsformat.Contains("ASTC_12x12"))
-                    format = TexFormat.ASTC_12x12;
-
-                if (ddsformat.Contains("BC1"))
-                    format = TexFormat.BC1;
-                if (ddsformat.Contains("BC2"))
-                    format = TexFormat.BC2;
-                if (ddsformat.Contains("BC3"))
-                    format = TexFormat.BC3;
-                if (ddsformat.Contains("BC4"))
-                    format = TexFormat.BC4;
-                if (ddsformat.Contains("BC5"))
-                    format = TexFormat.BC5;
-                if (ddsformat.Contains("BC6"))
-                    format = TexFormat.BC6;
-                if (ddsformat.Contains("BC7"))
-                    format = TexFormat.BC7;
-
-                if (ddsformat.Contains("R8G8B8A8"))
-                    format = TexFormat.RGB8;
-                if (ddsformat.Contains("B4G4R4A4"))
-                    format = TexFormat.BGRA4;
-                if (ddsformat.Contains("B5G5R5A1"))
-                    format = TexFormat.RGB5A1;
-                if (ddsformat.Contains("B5G6R5"))
-                    format = TexFormat.BGR5;
-                if (ddsformat.Contains("B8G8R8A8"))
-                    format = TexFormat.BGRA8;
-                if (ddsformat.Contains("B5G6R5"))
-                    format = TexFormat.RGB565;
-                if (ddsformat.Contains("B8G8R8X8"))
-                    format = TexFormat.BGRX8;
-
-                if (ddsformat.Contains("B8G8R8X8"))
-                    format = TexFormat.BGRX8;
-
-                if (ddsformat.Contains("A8P8"))
-                    format = TexFormat.A8P8;
-                if (ddsformat.Contains("AYUV"))
-                    format = TexFormat.AYUV;
-
-                if (ddsformat.Contains("A8_UNORM"))
-                    format = TexFormat.A8;
-            }
+                format = (TexFormat)Dx10Header.DxgiFormat;
             else
             {
                 switch (PfHeader.FourCC)
                 {
                     case FOURCC_DXT1:
-                        format = TexFormat.BC1;
+                        format = TexFormat.BC1_UNORM;
                         break;
                     case FOURCC_DXT2:
                     case FOURCC_DXT3:
-                        format = TexFormat.BC2;
+                        format = TexFormat.BC2_UNORM;
                         break;
                     case FOURCC_DXT4:
                     case FOURCC_DXT5:
-                        format = TexFormat.BC3;
+                        format = TexFormat.BC3_UNORM;
                         break;
                     case FOURCC_ATI1:
                     case FOURCC_BC4U:
-                        format = TexFormat.BC4;
+                        format = TexFormat.BC4_UNORM;
                         break;
                     case FOURCC_ATI2:
                     case FOURCC_BC5U:
-                        format = TexFormat.BC5;
-                        formatType = TexFormatType.Unorm;
+                        format = TexFormat.BC5_UNORM;
                         break;
                     case FOURCC_BC5S:
-                        format = TexFormat.BC5;
-                        formatType = TexFormatType.Snorm;
+                        format = TexFormat.BC5_SNORM;
                         break;
                     case FOURCC_RXGB:
-                        format = TexFormat.RGBA8;
+                        format = TexFormat.RGBA8_UNORM;
                         break;
                     default:
-                        format = TexFormat.RGBA8;
+                        format = TexFormat.RGBA8_UNORM;
                         break;
                 }
+                Platform.OutputFormat = format;
             }
-
-            Platform.OutputFormat = format;
-           // Platform.OutputFormatType = formatType;
         }
 
         public void SetFlags(TexFormat format, bool isDX10, bool isCubemap)

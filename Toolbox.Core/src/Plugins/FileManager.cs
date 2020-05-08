@@ -10,7 +10,7 @@ namespace Toolbox.Core
         public static ICompressionFormat[] GetCompressionFormats()
         {
             List<ICompressionFormat> types = new List<ICompressionFormat>();
-            foreach (var plugin in PluginManager.LoadPlugins())
+            foreach (var plugin in PluginManager.LoadPlugins(true))
                 types.AddRange(plugin.CompressionFormats);
 
             return types.ToArray();
@@ -19,7 +19,7 @@ namespace Toolbox.Core
         public static IFileFormat[] GetFileFormats()
         {
             List<IFileFormat> types = new List<IFileFormat>();
-            foreach (var plugin in PluginManager.LoadPlugins())
+            foreach (var plugin in PluginManager.LoadPlugins(true))
                 types.AddRange(plugin.FileFormats);
 
             return types.ToArray();
@@ -48,6 +48,15 @@ namespace Toolbox.Core
             List< IExportableAnimation> types = new List<IExportableAnimation> ();
             foreach (var plugin in PluginManager.LoadPlugins())
                 types.AddRange(plugin.ExportableAnimations);
+
+            return types.ToArray();
+        }
+
+        public static ITextureDecoder[] GetTextureDecoders()
+        {
+            List<ITextureDecoder> types = new List<ITextureDecoder>();
+            foreach (var plugin in PluginManager.LoadPlugins())
+                types.AddRange(plugin.TextureDecoders);
 
             return types.ToArray();
         }

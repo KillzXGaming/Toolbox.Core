@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Toolbox.Core.IO;
+using Toolbox.Core.Imaging;
 
 namespace Toolbox.Core
 {
@@ -65,29 +66,29 @@ namespace Toolbox.Core
                 Console.WriteLine(Depth);
 
                 if (BlockDimX == 4 && BlockDimY == 4)
-                    Platform.OutputFormat = TexFormat.ASTC_4x4;
+                    Platform.OutputFormat = TexFormat.ASTC_4x4_UNORM;
                 else if (BlockDimX == 5 && BlockDimY == 4)
-                    Platform.OutputFormat = TexFormat.ASTC_5x4;
+                    Platform.OutputFormat = TexFormat.ASTC_5x4_UNORM;
                 else if (BlockDimX == 5 && BlockDimY == 5)
-                    Platform.OutputFormat = TexFormat.ASTC_5x5;
+                    Platform.OutputFormat = TexFormat.ASTC_5x5_UNORM;
                 else if (BlockDimX == 6 && BlockDimY == 5)
-                    Platform.OutputFormat = TexFormat.ASTC_6x5;
+                    Platform.OutputFormat = TexFormat.ASTC_6x5_UNORM;
                 else if (BlockDimX == 6 && BlockDimY == 6)
-                    Platform.OutputFormat = TexFormat.ASTC_6x6;
+                    Platform.OutputFormat = TexFormat.ASTC_6x6_UNORM;
                 else if (BlockDimX == 8 && BlockDimY == 5)
-                    Platform.OutputFormat = TexFormat.ASTC_8x5;
+                    Platform.OutputFormat = TexFormat.ASTC_8x5_UNORM;
                 else if (BlockDimX == 8 && BlockDimY == 6)
-                    Platform.OutputFormat = TexFormat.ASTC_8x6;
+                    Platform.OutputFormat = TexFormat.ASTC_8x6_UNORM;
                 else if (BlockDimX == 8 && BlockDimY == 8)
-                    Platform.OutputFormat = TexFormat.ASTC_8x8;
+                    Platform.OutputFormat = TexFormat.ASTC_8x8_UNORM;
                 else if (BlockDimX == 10 && BlockDimY == 10)
-                    Platform.OutputFormat = TexFormat.ASTC_10x10;
+                    Platform.OutputFormat = TexFormat.ASTC_10x10_UNORM;
                 else if (BlockDimX == 10 && BlockDimY == 5)
-                    Platform.OutputFormat = TexFormat.ASTC_10x5;
+                    Platform.OutputFormat = TexFormat.ASTC_10x5_UNORM;
                 else if (BlockDimX == 10 && BlockDimY == 6)
-                    Platform.OutputFormat = TexFormat.ASTC_10x6;
+                    Platform.OutputFormat = TexFormat.ASTC_10x6_UNORM;
                 else if (BlockDimX == 10 && BlockDimY == 8)
-                    Platform.OutputFormat = TexFormat.ASTC_10x8;
+                    Platform.OutputFormat = TexFormat.ASTC_10x8_UNORM;
                 else
                     throw new Exception($"Unsupported block dims! ({BlockDimX} x {BlockDimY})");
             }
@@ -134,13 +135,15 @@ namespace Toolbox.Core
         {
             List<Surface> surfaces = texture.GetSurfaces(settings.ArrayLevel, settings.ExportArrays);
 
+            var format = texture.Platform.OutputFormat;
+
             ASTC atsc = new ASTC();
             atsc.Width = texture.Width;
             atsc.Height = texture.Height;
             atsc.Depth = texture.Depth;
-            atsc.BlockDimX = (byte)TextureFormatHelper.GetBlockWidth(texture.Platform.OutputFormat);
-            atsc.BlockDimY = (byte)TextureFormatHelper.GetBlockHeight(texture.Platform.OutputFormat);
-            atsc.BlockDimZ = (byte)TextureFormatHelper.GetBlockDepth(texture.Platform.OutputFormat);
+            atsc.BlockDimX = (byte)TextureFormatHelper.GetBlockWidth(format);
+            atsc.BlockDimY = (byte)TextureFormatHelper.GetBlockHeight(format);
+            atsc.BlockDimZ = (byte)TextureFormatHelper.GetBlockDepth(format);
             atsc.DataBlock = ByteUtils.CombineArray(surfaces[0].mipmaps.ToArray());
             atsc.Save(new System.IO.FileStream(filePath, System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite));
         }

@@ -1,5 +1,7 @@
 syntax: glob
 
+Plugins/
+
 #NuGet things
 project.lock.json
 

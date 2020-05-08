@@ -106,7 +106,7 @@ namespace Toolbox.Core
         /// <summary>
         /// The swizzle method to use when decoding or encoding back a texture.
         /// </summary>
-        public IPlatformSwizzle Platform = new PlatformSwizzle.DefaultSwizzle();
+        public IPlatformSwizzle Platform = new Imaging.DefaultSwizzle();
 
         /// <summary>
         /// Gets the image size from bytes into a string format.
@@ -269,46 +269,51 @@ namespace Toolbox.Core
             byte[] data = GetImageData(ArrayLevel, MipLevel, DepthLevel);
             byte[] paletteData = GetPaletteData();
 
+            Console.WriteLine($"data {data.Length}");
             data = Platform.DecodeImage(this, data, width, height, ArrayLevel, MipLevel);
-            if (Platform.OutputFormat != TexFormat.RGB8)
-                data = DecodeBlock(data, width, height, Platform.OutputFormat, Platform.OutputFormatType);
+            Console.WriteLine($"data2 {data.Length}");
+
+            Console.WriteLine($"OutputFormat {Platform.OutputFormat}");
+
+            if (Platform.OutputFormat != TexFormat.RGBA8_UNORM)
+                data = DecodeBlock(data, width, height, Platform.OutputFormat);
+            else
+                data = ImageUtility.ConvertBgraToRgba(data);
 
             return BitmapExtension.CreateBitmap(data, (int)width, (int)height);
-
-            return null;
         }
 
-        public static byte[] DecodeBlock(byte[] data, uint width, uint height, TexFormat format,
-            byte[] paletteData, PaletteFormat paletteFormat, IPlatformSwizzle platform)
-        {
-            byte[] output = data;
-
-            if (platform is PlatformSwizzle.GamecubeSwizzle)
+        public static byte[] DecodeBlock(byte[] data, uint width, uint height, TexFormat format) {
+            byte[] output = new byte[0];
+            foreach (var decoder in FileManager.GetTextureDecoders())
             {
-                output = Decode_Gamecube.DecodeData(data, paletteData, width, height, format, paletteFormat);
+                Console.WriteLine($"decoder {decoder}");
+
+                bool isDecoded = decoder.Decode(format, data, (int)width, (int)height, out output);
+                if (isDecoded)
+                    return output != null ? ImageUtility.ConvertBgraToRgba(output) : new byte[0];
+
+             //   return ImageUtility.ConvertBgraToRgba(output);
             }
-
-            return output;
+            return output != null ? ImageUtility.ConvertBgraToRgba(output) : new byte[0];
         }
 
-        public static byte[] DecodeBlock(byte[] data, uint Width, uint Height, 
-            TexFormat format, TexFormatType type)
+        public uint GetBlockWidth()
         {
-            int blockWidth = (int)TextureFormatHelper.GetBlockWidth(format);
-            int blockHeight = (int)TextureFormatHelper.GetBlockHeight(format);
-            int blockDepth = (int)TextureFormatHelper.GetBlockDepth(format);
-
-            if (IsAtscFormat(format))
-                return ASTCDecoder.DecodeToRGBA8888(data,
-                    (int)blockWidth,
-                    (int)blockHeight, 1, (int)Width, (int)Height, 1);
-            else
-                return DDSDecoder.DecodeToRGBA8(data,
-                    (int)Width, (int)Height, format, type);
+            var format = Platform.OutputFormat;
+            return TextureFormatHelper.GetBlockWidth(format);
         }
 
-        public static bool IsAtscFormat(TexFormat format) {
-            return format.ToString().StartsWith("ASTC");
+        public uint GetBlockHeight()
+        {
+            var format = Platform.OutputFormat;
+            return TextureFormatHelper.GetBlockHeight(format);
+        }
+
+        public uint GetBlockDepth()
+        {
+            var format = Platform.OutputFormat;
+            return TextureFormatHelper.GetBlockDepth(format);
         }
 
         /// <summary>
@@ -318,9 +323,9 @@ namespace Toolbox.Core
         {
             get
             {
-                if (Platform is PlatformSwizzle.CTRSwizzle)
+                if (Platform is Imaging.CTRSwizzle)
                     return GetImageSize3DS();
-                if (Platform is PlatformSwizzle.GamecubeSwizzle)
+                if (Platform is Imaging.GamecubeSwizzle)
                     return GetImageSizeGCN();
                 else
                     return GetImageSizeDefault();
@@ -332,27 +337,24 @@ namespace Toolbox.Core
             var format = Platform.OutputFormat;
 
             int totalSize = 0;
-            if (TextureFormatHelper.HasFormatTableKey(format))
+            uint bpp = TextureFormatHelper.GetBytesPerPixel(format);
+
+            for (int arrayLevel = 0; arrayLevel < ArrayCount; arrayLevel++)
             {
-                uint bpp = TextureFormatHelper.GetBytesPerPixel(format);
-
-                for (int arrayLevel = 0; arrayLevel < ArrayCount; arrayLevel++)
+                for (int mipLevel = 0; mipLevel < MipCount; mipLevel++)
                 {
-                    for (int mipLevel = 0; mipLevel < MipCount; mipLevel++)
+                    uint width = (uint)Math.Max(1, Width >> mipLevel);
+                    uint height = (uint)Math.Max(1, Height >> mipLevel);
+
+                    uint size = width * height * bpp;
+                    if (format is BCN)
                     {
-                        uint width = (uint)Math.Max(1, Width >> mipLevel);
-                        uint height = (uint)Math.Max(1, Height >> mipLevel);
-
-                        uint size = width * height * bpp;
-                        if (TextureFormatHelper.IsBCNCompressed(format))
-                        {
-                            size = ((width + 3) >> 2) * ((Height + 3) >> 2) * bpp;
-                            if (size < bpp)
-                                size = bpp;
-                        }
-
-                        totalSize += (int)size;
+                        size = ((width + 3) >> 2) * ((Height + 3) >> 2) * bpp;
+                        if (size < bpp)
+                            size = bpp;
                     }
+
+                    totalSize += (int)size;
                 }
             }
             return totalSize;
@@ -360,7 +362,7 @@ namespace Toolbox.Core
 
         private int GetImageSizeGCN()
         {
-            var platform = (PlatformSwizzle.GamecubeSwizzle)Platform;
+            var platform = (GamecubeSwizzle)Platform;
 
             int totalSize = 0;
             for (int arrayLevel = 0; arrayLevel < ArrayCount; arrayLevel++)
@@ -379,7 +381,7 @@ namespace Toolbox.Core
 
         private int GetImageSize3DS()
         {
-            var platform = (PlatformSwizzle.CTRSwizzle)Platform;
+            var platform = (CTRSwizzle)Platform;
 
             int totalSize = 0;
             for (int arrayLevel = 0; arrayLevel < ArrayCount; arrayLevel++)

@@ -26,7 +26,7 @@ namespace Toolbox.Core
         public GenericBitmapTexture(byte[] FileData, int width, int height)
         {
             Name = $"bitmap_{width}x{height}";
-            Platform.OutputFormat = TexFormat.RGB8;
+            Platform.OutputFormat = TexFormat.RGBA8_UNORM;
             Width = (uint)width;
             Height = (uint)height;
 
@@ -64,7 +64,7 @@ namespace Toolbox.Core
                 ImageData = ImageUtility.ConvertBgraToRgba(ImageData);
             Width = (uint)bitmap.Width;
             Height = (uint)bitmap.Height;
-            Platform.OutputFormat = TexFormat.RGB8;
+            Platform.OutputFormat = TexFormat.RGBA8_UNORM;
             MipCount = 1;
         }
 

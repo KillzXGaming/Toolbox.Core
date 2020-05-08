@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Toolbox.Core
+namespace Toolbox.Core.DXGI
 {
     public enum DXGI_FORMAT : uint
     {

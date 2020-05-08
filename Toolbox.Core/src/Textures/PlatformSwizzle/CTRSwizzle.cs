@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Toolbox.Core.PlatformSwizzle
+namespace Toolbox.Core.Imaging
 {
     public class CTRSwizzle : IPlatformSwizzle
     {
-        public TexFormat OutputFormat { get; set; } = TexFormat.RGB8;
-        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
+        public TexFormat OutputFormat { get; set; } = TexFormat.RGBA8_UNORM;
 
         public CTR_3DS.Orientation SwizzleMode = CTR_3DS.Orientation.Default;
         public CTR_3DS.PICASurfaceFormat Format = CTR_3DS.PICASurfaceFormat.RGB8;

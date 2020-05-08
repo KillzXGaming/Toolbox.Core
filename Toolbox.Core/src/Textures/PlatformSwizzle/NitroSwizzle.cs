@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Toolbox.Core.PlatformSwizzle
+namespace Toolbox.Core.Imaging
 {
     public class NitroSwizzle : IPlatformSwizzle
     {
-        public TexFormat OutputFormat { get; set; } = TexFormat.RGB8;
-        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
+        public TexFormat OutputFormat { get; set; } = TexFormat.RGBA8_UNORM;
 
         public bool isColor0 = true;
 

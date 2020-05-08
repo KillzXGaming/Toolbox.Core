@@ -22,6 +22,12 @@ namespace Toolbox.Core
         public List<int> BoneIndices = new List<int>();
         public List<string> BoneNames = new List<string>();
 
+        public STVertex()
+        {
+            TexCoords = new Vector2[0];
+            Colors = new Vector4[0]; 
+        }
+
         public float DistanceTo(STVertex vertex)
         {
             float deltaX = vertex.Position.X - Position.X;

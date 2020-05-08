@@ -2,19 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Toolbox.Core.PlatformSwizzle
+namespace Toolbox.Core.Imaging
 {
     public class DefaultSwizzle : IPlatformSwizzle
     {
-        /// <summary>
-        /// The output <see cref="TexFormat"/> format of the image after being swizzled. 
-        /// </summary>
-        public TexFormat OutputFormat { get; set; } = TexFormat.RGB8;
-
-        /// <summary>
-        /// The <see cref="TexFormatType"/> type of the image. 
-        /// </summary>
-        public TexFormatType OutputFormatType { get; set; } = TexFormatType.Unorm;
+        public TexFormat OutputFormat { get; set; } = TexFormat.RGBA8_UNORM;
 
         public bool IsOuputRGBA8 => false;
 

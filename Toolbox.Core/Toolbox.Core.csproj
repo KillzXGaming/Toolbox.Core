@@ -17,23 +17,6 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Drawing\**" />
-    <Compile Remove="IO\**" />
-    <Compile Remove="Plugins\**" />
-    <Compile Remove="Samples\**" />
-    <Compile Remove="Textures\**" />
-    <EmbeddedResource Remove="Drawing\**" />
-    <EmbeddedResource Remove="IO\**" />
-    <EmbeddedResource Remove="Plugins\**" />
-    <EmbeddedResource Remove="Samples\**" />
-    <EmbeddedResource Remove="Textures\**" />
-    <None Remove="Drawing\**" />
-    <None Remove="IO\**" />
-    <None Remove="Plugins\**" />
-    <None Remove="Samples\**" />
-    <None Remove="Textures\**" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="External\" />
   </ItemGroup>
 

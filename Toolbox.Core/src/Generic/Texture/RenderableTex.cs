@@ -206,8 +206,8 @@ namespace Toolbox.Core
                 pixelInternalFormat = PixelInternalFormat.Rgba;
                 pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
 
-                if (GenericTexture.Platform is PlatformSwizzle.CTRSwizzle ||
-                    GenericTexture.Platform is PlatformSwizzle.GamecubeSwizzle)
+                if (GenericTexture.Platform is Imaging.CTRSwizzle ||
+                    GenericTexture.Platform is Imaging.GamecubeSwizzle)
                 {
                     UseOpenGLDecoder = false;
                     pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
@@ -215,7 +215,7 @@ namespace Toolbox.Core
 
 
                 if (UseOpenGLDecoder)
-                    SetPixelFormats(GenericTexture.Platform.OutputFormat, GenericTexture.Platform.OutputFormatType);
+                    SetPixelFormats(GenericTexture.Platform.OutputFormat);
 
                 GLInitialized = true;
                 for (int i = 0; i < Surfaces.Count; i++)
@@ -256,49 +256,46 @@ namespace Toolbox.Core
             return Value != 0 && (Value & (Value - 1)) == 0;
         }
 
-        private void SetPixelFormats(TexFormat Format, TexFormatType type)
+        private void SetPixelFormats(TexFormat Format)
         {
             switch (Format)
             {
-                case TexFormat.BC1:
+                case TexFormat.BC1_UNORM:
+                case TexFormat.BC1_SRGB:
                     pixelInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt1Ext;
                     break;
-                case TexFormat.BC2:
+                case TexFormat.BC2_UNORM:
+                case TexFormat.BC2_SRGB:
                     pixelInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt3Ext;
                     break;
-                case TexFormat.BC3:
+                case TexFormat.BC3_UNORM:
+                case TexFormat.BC3_SRGB:
                     pixelInternalFormat = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
                     break;
-                case TexFormat.BC4:
-                    if (type == TexFormatType.Snorm)
-                        pixelInternalFormat = PixelInternalFormat.CompressedSignedRedRgtc1;
-                    else
-                        pixelInternalFormat = PixelInternalFormat.CompressedRedRgtc1;
+                case TexFormat.BC4_UNORM:
+                    pixelInternalFormat = PixelInternalFormat.CompressedRedRgtc1;
                     break;
-                case TexFormat.BC5:
-                    if (type == TexFormatType.Snorm)
-                    {
-                        pixelInternalFormat = PixelInternalFormat.Rgba;
-                        pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
-                    }
-                    else
-                        pixelInternalFormat = PixelInternalFormat.CompressedRgRgtc2;
+                case TexFormat.BC4_SNORM:
+                    pixelInternalFormat = PixelInternalFormat.CompressedSignedRedRgtc1;
                     break;
-                case TexFormat.BC6:
-                    if (type == TexFormatType.UnsignedFloat)
-                        pixelInternalFormat = PixelInternalFormat.CompressedRgbBptcUnsignedFloat;
-                    else
-                        pixelInternalFormat = PixelInternalFormat.CompressedRgbBptcSignedFloat;
-                    break;
-                case TexFormat.BC7:
-                    if (type == TexFormatType.Srgb)
-                        pixelInternalFormat = PixelInternalFormat.CompressedSrgbAlphaBptcUnorm;
-                    else
-                        pixelInternalFormat = PixelInternalFormat.CompressedRgbaBptcUnorm;
-                    break;
-                case TexFormat.RGB8:
+                case TexFormat.BC5_SNORM:
                     pixelInternalFormat = PixelInternalFormat.Rgba;
                     pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
+                    break;
+                case TexFormat.BC5_UNORM:
+                    pixelInternalFormat = PixelInternalFormat.CompressedRgRgtc2;
+                    break;
+                case TexFormat.BC6H_UF16:
+                    pixelInternalFormat = PixelInternalFormat.CompressedRgbBptcUnsignedFloat;
+                    break;
+                case TexFormat.BC6H_SF16:
+                    pixelInternalFormat = PixelInternalFormat.CompressedRgbBptcSignedFloat;
+                    break;
+                case TexFormat.BC7_SRGB:
+                    pixelInternalFormat = PixelInternalFormat.CompressedSrgbAlphaBptcUnorm;
+                    break;
+                case TexFormat.BC7_UNORM:
+                    pixelInternalFormat = PixelInternalFormat.CompressedRgbaBptcUnorm;
                     break;
                 default:
                     pixelInternalFormat = PixelInternalFormat.Rgba;
@@ -307,15 +304,8 @@ namespace Toolbox.Core
             }
         }
 
-        private byte[] TryDecodeSurface(byte[] imageData, uint width, uint height, STGenericTexture texture)
-        {
-            return STGenericTexture.DecodeBlock(imageData,
-                 width,
-                 height,
-                 texture.Platform.OutputFormat,
-                 texture.GetPaletteData(),
-                 texture.PaletteFormat,
-                 texture.Platform);
+        private byte[] TryDecodeSurface(byte[] imageData, uint width, uint height, STGenericTexture texture) {
+            return STGenericTexture.DecodeBlock(imageData, width, height, texture.Platform.OutputFormat);
         }
 
         public static int GenerateOpenGLTexture(RenderableTex t, Bitmap bitmap, bool generateMips = false)

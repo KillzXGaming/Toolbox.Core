@@ -67,6 +67,8 @@ namespace Toolbox.Core.OpenGL
         public virtual void RenderMaterials(ShaderProgram shader, 
             STGenericMesh mesh,  STPolygonGroup group, STGenericMaterial material)
         {
+            if (material == null) return;
+
             SetDefaultUniforms(shader);
 
             int textureUintID = 1;
@@ -83,9 +85,32 @@ namespace Toolbox.Core.OpenGL
 
         public virtual void OnMeshDraw(MeshRender msh, STPolygonGroup group)
         {
+            PrimitiveType mode = PrimitiveType.Triangles;
+            switch (group.PrimitiveType)
+            {
+                case STPrimitiveType.TriangleStrips:
+                    mode = PrimitiveType.TriangleStrip;
+                    break;
+                case STPrimitiveType.TriangleFans:
+                    mode = PrimitiveType.TriangleFan;
+                    break;
+                case STPrimitiveType.Lines:
+                    mode = PrimitiveType.Lines;
+                    break;
+                case STPrimitiveType.Points:
+                    mode = PrimitiveType.Points;
+                    break;
+                case STPrimitiveType.QuadStrips:
+                    mode = PrimitiveType.QuadStrip;
+                    break;
+                case STPrimitiveType.Quad:
+                    mode = PrimitiveType.Quads;
+                    break;
+            }
+
             msh.vao.Enable();
             msh.vao.Use();
-            GL.DrawElements(BeginMode.Triangles,
+            GL.DrawElements(mode,
                 group.Faces.Count,
                 DrawElementsType.UnsignedInt,
                 group.FaceOffset);
