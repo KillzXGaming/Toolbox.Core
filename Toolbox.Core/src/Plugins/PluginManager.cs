@@ -12,15 +12,26 @@ namespace Toolbox.Core
 
         public class PluginInstance
         {
+            //File handling
             public List<IFileFormat> FileFormats = new List<IFileFormat>();
             public List<ICompressionFormat> CompressionFormats = new List<ICompressionFormat>();
-            public List<IFileEditor> FileEditors = new List<IFileEditor>();
+
+            //Exportables
             public List<IExportableModel> ExportableModels = new List<IExportableModel>();
             public List<IExportableAnimation> ExportableAnimations = new List<IExportableAnimation>();
             public List<IExportableTexture> ExportableTextures = new List<IExportableTexture>();
-            public List<ITextureDecoder> TextureDecoders = new List<ITextureDecoder>();
+
+            //importables
+            public List<IImportableTexture> ImportableTextures = new List<IImportableTexture>();
+            public List<IImportableModel> ImportableModels = new List<IImportableModel>();
+
+            //GUI based
+            public List<IFileEditor> FileEditors = new List<IFileEditor>();
             public List<IFileIconLoader> FileIconLoaders = new List<IFileIconLoader>();
-            
+
+            //Texture decoding
+            public List<ITextureDecoder> TextureDecoders = new List<ITextureDecoder>();
+
             public IPlugin PluginHandler;
         }
 
@@ -93,14 +104,6 @@ namespace Toolbox.Core
         private static PluginInstance SearchAssembly(Assembly assembly)
         {
             Type pluginType = typeof(IPlugin);
-            Type fileFormatType = typeof(IFileFormat);
-            Type compressionType = typeof(ICompressionFormat);
-            Type fileEditorType = typeof(IFileEditor);
-            Type textureDecoderType = typeof(ITextureDecoder);
-            Type fileIconLoaderType = typeof(IFileIconLoader);
-            Type exportableTexType = typeof(IExportableTexture);
-
-            
             PluginInstance plugin = new PluginInstance();
 
             if (assembly != null)
@@ -116,34 +119,17 @@ namespace Toolbox.Core
                         }
                         else
                         {
-                            if (type.GetInterface(pluginType.FullName) != null)
-                            {
+                            if (type.GetInterface(pluginType.FullName) != null) {
                                 plugin.PluginHandler = (IPlugin)Activator.CreateInstance(type);
                             }
-                            if (type.GetInterface(fileFormatType.FullName) != null)
-                            {
-                                plugin.FileFormats.Add((IFileFormat)Activator.CreateInstance(type));
-                            }
-                            if (type.GetInterface(compressionType.FullName) != null)
-                            {
-                                plugin.CompressionFormats.Add((ICompressionFormat)Activator.CreateInstance(type));
-                            }
-                            if (type.GetInterface(fileEditorType.FullName) != null)
-                            {
-                                plugin.FileEditors.Add((IFileEditor)Activator.CreateInstance(type));
-                            }
-                            if (type.GetInterface(textureDecoderType.FullName) != null)
-                            {
-                                plugin.TextureDecoders.Add((ITextureDecoder)Activator.CreateInstance(type));
-                            }
-                            if (type.GetInterface(fileIconLoaderType.FullName) != null)
-                            {
-                                plugin.FileIconLoaders.Add((IFileIconLoader)Activator.CreateInstance(type));
-                            }
-                            if (type.GetInterface(exportableTexType.FullName) != null)
-                            {
-                                plugin.ExportableTextures.Add((IExportableTexture)Activator.CreateInstance(type));
-                            }
+
+                            AddTypeList(plugin.FileFormats, type);
+                            AddTypeList(plugin.CompressionFormats, type);
+                            AddTypeList(plugin.FileEditors, type);
+                            AddTypeList(plugin.TextureDecoders, type);
+                            AddTypeList(plugin.FileIconLoaders, type);
+                            AddTypeList(plugin.ExportableTextures, type);
+                            AddTypeList(plugin.ImportableTextures, type);
                         }
                     }
                 }
@@ -169,6 +155,13 @@ namespace Toolbox.Core
                 }
             }
             return plugin;
+        }
+
+        private static void AddTypeList<T>(List<T> list, Type type)
+        {
+            if (type.GetInterface(typeof(T).FullName) != null) {
+                list.Add((T)Activator.CreateInstance(type));
+            }
         }
     }
 }

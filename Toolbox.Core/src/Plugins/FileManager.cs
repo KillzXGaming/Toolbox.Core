@@ -34,6 +34,15 @@ namespace Toolbox.Core
             return types.ToArray();
         }
 
+        public static IImportableTexture[] GetImportableTextures()
+        {
+            List<IImportableTexture> types = new List<IImportableTexture>();
+            foreach (var plugin in PluginManager.LoadPlugins())
+                types.AddRange(plugin.ImportableTextures);
+
+            return types.ToArray();
+        }
+
         public static IExportableTexture[] GetExportableTextures()
         {
             List<IExportableTexture> types = new List<IExportableTexture>();
