@@ -19,6 +19,10 @@ namespace Toolbox.Core.Imaging
             OutputFormat = format;
         }
 
+        public override string ToString() {
+            return OutputFormat.ToString();
+        }
+
         public byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
 
             if (BlockHeightLog2 == 0)

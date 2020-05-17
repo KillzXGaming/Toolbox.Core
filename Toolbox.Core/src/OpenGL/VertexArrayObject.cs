@@ -27,6 +27,9 @@ namespace Toolbox.Core.OpenGL
 
         public void Initialize()
         {
+            if (vaoID != -1)
+                return;
+
             int vao = GL.GenVertexArray();
             GL.BindVertexArray(vao);
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
@@ -34,14 +37,27 @@ namespace Toolbox.Core.OpenGL
             foreach (KeyValuePair<int, VertexAttribute> a in attributes)
             {
                 GL.EnableVertexAttribArray(a.Key);
-                GL.VertexAttribPointer(a.Key, a.Value.size, a.Value.type, a.Value.normalized, a.Value.stride, a.Value.offset);
+                if (a.Value.type == VertexAttribPointerType.Int)
+                    GL.VertexAttribIPointer(a.Key, a.Value.size, VertexAttribIntegerType.Int, a.Value.stride, new System.IntPtr(a.Value.offset));
+                else
+                    GL.VertexAttribPointer(a.Key, a.Value.size, a.Value.type, a.Value.normalized, a.Value.stride, a.Value.offset);
             }
             vaoID = vao;
         }
 
         public void Enable()
         {
+            GL.BindVertexArray(vaoID);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
 
+            foreach (KeyValuePair<int, VertexAttribute> a in attributes)
+            {
+                GL.EnableVertexAttribArray(a.Key);
+                if (a.Value.type == VertexAttribPointerType.Int)
+                    GL.VertexAttribIPointer(a.Key, a.Value.size, VertexAttribIntegerType.Int, a.Value.stride, new System.IntPtr(a.Value.offset));
+                else
+                    GL.VertexAttribPointer(a.Key, a.Value.size, a.Value.type, a.Value.normalized, a.Value.stride, a.Value.offset);
+            }
         }
 
         public void Bind()

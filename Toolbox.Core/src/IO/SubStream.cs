@@ -50,6 +50,7 @@ namespace Toolbox.Core.IO
             Position += read;
             return read;
         }
+
         public override long Length => length;
         public override bool CanRead => true;
         public override bool CanWrite => false;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.IO;
 using Toolbox.Core.IO;
 
@@ -9,6 +9,11 @@ namespace Toolbox.Core
     public class ArchiveFileInfo
     {
         public string FileName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Toggles visibily of the entry in GUI.
+        /// </summary>
+        public bool Visibile { get; set; } = true;
 
         protected Stream _stream;
 
@@ -49,19 +54,33 @@ namespace Toolbox.Core
 
         public virtual IFileFormat OpenFile()
         {
-            var file = STFileLoader.OpenFileFormat(FileData, FileName);
+            var data = FileData;
+            var file = STFileLoader.OpenFileFormat(DecompressData(data), FileName);
             return file;
         }
 
         public virtual uint GetFileSize() { return 0; return (uint)FileData.Length; }
 
+        public Task FileWriteAsync(string filePath) {
+           return Task.Run(() => FileData.SaveToFile(filePath));
+        }
+
         public void SaveFileFormat()
         {
             if (FileFormat != null && FileFormat.CanSave) {
-                var mem = new MemoryStream();
-                STFileSaver.SaveFileFormat(FileFormat, mem);
-                FileData = mem;
+                var mem = new System.IO.MemoryStream();
+                FileFormat.Save(mem);
+                FileData = CompressData(new MemoryStream(mem.ToArray()));
+                //FileFormat.Load(FileData);
             }
+        }
+
+        public virtual Stream DecompressData(Stream compressed) {
+            return compressed;
+        }
+
+        public virtual Stream CompressData(Stream decompressed) {
+            return decompressed;
         }
     }
 }

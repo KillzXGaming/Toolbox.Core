@@ -30,9 +30,6 @@ namespace Toolbox.Core
         {
             set
             {
-                Scale = value.ExtractScale();
-                Rotation = value.ExtractRotation();
-                Position = value.ExtractTranslation();
                 transform = value;
             }
             get
@@ -112,14 +109,17 @@ namespace Toolbox.Core
 
         public STBone(STSkeleton parentSkeleton) {
             Skeleton = parentSkeleton;
+            Scale = Vector3.One;
+            Position = Vector3.Zero;
+            Rotation = Quaternion.Identity;
         }
 
         public STBone(STSkeleton parentSkeleton, string name) {
             Skeleton = parentSkeleton;
             Name = name;
-            Scale = new Vector3(1,1,1);
-            Position = new Vector3(0,0,0);
-            EulerRotation = new Vector3(0,0,0);
+            Scale = Vector3.One;
+            Position = Vector3.Zero;
+            Rotation = Quaternion.Identity;
         }
 
         /// <summary>

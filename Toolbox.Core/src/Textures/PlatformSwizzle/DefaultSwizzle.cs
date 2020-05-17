@@ -8,6 +8,10 @@ namespace Toolbox.Core.Imaging
     {
         public TexFormat OutputFormat { get; set; } = TexFormat.RGBA8_UNORM;
 
+        public override string ToString() {
+            return OutputFormat.ToString();
+        }
+
         public bool IsOuputRGBA8 => false;
 
         public byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {

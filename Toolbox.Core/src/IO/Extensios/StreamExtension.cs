@@ -37,6 +37,12 @@ namespace Toolbox.Core.IO
 
         public static void SaveToFile(this Stream stream, string fileName)
         {
+            if (stream == null) return;
+
+            string dir = Path.GetDirectoryName(fileName);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
             using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.Write))
             {
                 stream.Position = 0;

@@ -35,7 +35,7 @@ namespace Toolbox.Core.Animations
         /// Whether the animation will loop or not after
         /// the playback rearches the total frame count.
         /// </summary>
-        public bool Loop { get; set; }
+        public bool Loop { get; set; } = true;
 
         /// <summary>
         /// The step value when a frame advances.

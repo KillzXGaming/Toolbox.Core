@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using OpenTK;
+using Toolbox.Core.ModelView;
 
 namespace Toolbox.Core
 {
@@ -15,6 +16,11 @@ namespace Toolbox.Core
         /// A list of bones attatched to the skeleton.
         /// </summary>
         public List<STBone> Bones = new List<STBone>();
+
+        /// <summary>
+        /// Determines if the skeleton is currently visible in the scene.
+        /// </summary>
+        public bool Visible { get; set; }
 
         /// <summary>
         /// Resets the current pose back to the original state.
@@ -62,19 +68,36 @@ namespace Toolbox.Core
         {
             Updated = true;
             foreach (STBone Bone in Bones)
-                Bone.Transform = GetMatrix(Bone);
+                Bone.Transform = GetWorldMatrix(Bone);
         }
 
-        private Matrix4 GetMatrix(STBone bone) {
+        public ObjectTreeNode[] CreateBoneTree()
+        {
+            List<ObjectTreeNode> nodes = new List<ObjectTreeNode>();
+            foreach (var bone in Bones)
+                nodes.Add(new ObjectTreeNode(bone.Name) { Tag = bone, ImageKey = "Bone" });
+
+            List<ObjectTreeNode> roots = new List<ObjectTreeNode>();
+            foreach (var bone in Bones)
+            {
+                int index = Bones.IndexOf(bone);
+                if (bone.ParentIndex != -1)
+                    nodes[bone.ParentIndex].AddChild(nodes[index]);
+                else
+                    roots.Add(nodes[index]);
+            }
+
+            return roots.ToArray();
+        }
+
+        private Matrix4 GetWorldMatrix(STBone bone) {
             var transform =
                 Matrix4.CreateScale(bone.AnimationController.Scale) *
                 Matrix4.CreateFromQuaternion(bone.AnimationController.Rotation) *
                 Matrix4.CreateTranslation(bone.AnimationController.Position);
 
-            Console.WriteLine($"Bone {bone.Name} parent {bone.ParentIndex} transform {transform}");
-
             if (bone.ParentIndex != -1)
-                return transform * GetMatrix(bone.Parent);
+                return transform * GetWorldMatrix(bone.Parent);
             else
                 return transform;
         }

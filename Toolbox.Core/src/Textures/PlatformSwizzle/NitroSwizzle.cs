@@ -12,6 +12,10 @@ namespace Toolbox.Core.Imaging
 
         public Nitro.NitroTex.NitroTexFormat Format;
 
+        public override string ToString() {
+            return Format.ToString();
+        }
+
         public NitroSwizzle(Nitro.NitroTex.NitroTexFormat format, bool isColor0 = true) {
             Format = format;
         }

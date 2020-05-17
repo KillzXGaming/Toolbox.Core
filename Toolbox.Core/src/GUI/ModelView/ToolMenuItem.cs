@@ -8,6 +8,8 @@ namespace Toolbox.Core.ModelView
     {
         public string Name { get; set; }
 
+        public bool Enabled { get; set; } = true;
+
         public EventHandler Click;
 
         public List<ToolMenuItem> Children = new List<ToolMenuItem>();

@@ -9,7 +9,15 @@ using Toolbox.Core.Imaging;
 namespace Toolbox.Core
 {
     public class GenericBitmapTexture : STGenericTexture, IFileFormat, IExportableTexture
-    {   
+    {
+        public bool IdentifyExport(string ext) {
+            return
+                ext == ".png" ||
+                ext == "jpg" ||
+                ext == ".gif" ||
+                ext == ".tiff"; 
+        }
+
         public bool CanSave { get; set; } = true;
 
         public string[] Description { get; set; } = new string[] { "PNG" };
@@ -72,7 +80,7 @@ namespace Toolbox.Core
         {
 
         }
-
+            
         public void Save(System.IO.Stream stream)
         {
             ImageFormat format = ImageFormat.Png;
@@ -92,6 +100,7 @@ namespace Toolbox.Core
         public void Export(STGenericTexture texture, TextureExportSettings settings, string filePath)
         {
             int numSurfaces = settings.ExportArrays ? (int)texture.ArrayCount : 1;
+            if (numSurfaces == 0) numSurfaces = 1;
             for (int i = 0; i < numSurfaces; i++)
             {
                 var image = texture.GetBitmap(i);

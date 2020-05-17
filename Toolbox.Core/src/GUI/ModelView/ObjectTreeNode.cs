@@ -40,12 +40,14 @@ namespace Toolbox.Core.ModelView
         public ObjectTreeNode()
         {
             Children = new List<ObjectTreeNode>();
+            ImageKey = "Folder";
         }
 
         public ObjectTreeNode(string text)
         {
             Children = new List<ObjectTreeNode>();
             Label = text;
+            ImageKey = "Folder";
         }
 
         public virtual void OnBeforeExpand()

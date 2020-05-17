@@ -74,6 +74,8 @@ namespace Toolbox.Core.Imaging
             { GX2.GX2SurfaceFormat.TC_R8_UNORM, TexFormat.RGBA8_UNORM },
             { GX2.GX2SurfaceFormat.TC_R8_G8_UNORM, TexFormat.RG8_UNORM },
             { GX2.GX2SurfaceFormat.TCS_R8_G8_B8_A8_UNORM, TexFormat.RGBA8_UNORM  },
+            { GX2.GX2SurfaceFormat.TCS_R8_G8_B8_A8_SRGB, TexFormat.RGBA8_SRGB  },
+
             { GX2.GX2SurfaceFormat.TC_R4_G4_B4_A4_UNORM, TexFormat.RGBA4_UNORM },
             { GX2.GX2SurfaceFormat.T_R4_G4_UNORM, TexFormat.RG4_UNORM},
             { GX2.GX2SurfaceFormat.TCS_R5_G6_B5_UNORM,TexFormat.RGB565_UNORM },

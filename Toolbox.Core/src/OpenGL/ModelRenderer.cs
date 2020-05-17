@@ -9,7 +9,7 @@ namespace Toolbox.Core.OpenGL
     /// <summary>
     /// Represents a renderable model.
     /// </summary>
-    public class ModelRenderer
+    public class ModelRenderer : IDisposable
     {
         /// <summary>
         /// The main shader to use when rendering the model.
@@ -20,26 +20,37 @@ namespace Toolbox.Core.OpenGL
 
         public STGenericModel Model;
 
+        public SkeletonRenderer SkeletonRender;
+
         public ModelRenderer(STGenericModel model) {
             Model = model;
 
             foreach (var mesh in Model.Meshes)
                 Meshes.Add(new MeshRender(mesh));
+
+            SkeletonRender = new SkeletonRenderer(model);
         }
 
-        public virtual void OnRender(Camera camera)
+        public void OnRender(Camera camera, Vector4 highlightColor)
         {
             if (ShaderProgram == null)
                 PrepareShaders();
+
+            //SkeletonRender.Render(camera);
 
             Matrix4 mtxMdl = camera.ModelMatrix;
             Matrix4 mtxCam = camera.ViewMatrix * camera.ProjectionMatrix;
 
             ShaderProgram.Enable();
-            ShaderProgram.SetVector4("highlight_color", Vector4.Zero);
+            ShaderProgram.SetVector4("highlight_color", highlightColor);
             ShaderProgram.SetMatrix4x4("mtxMdl", ref mtxMdl);
             ShaderProgram.SetMatrix4x4("mtxCam", ref mtxCam);
-            Console.WriteLine($"OnRender");
+            ReloadUniforms(ShaderProgram);
+        }
+
+        public void Dispose()
+        {
+
         }
 
         public virtual void ReloadUniforms(ShaderProgram shader)
@@ -47,29 +58,19 @@ namespace Toolbox.Core.OpenGL
 
         }
 
-        public virtual void DrawModel(ShaderProgram shader)
-        {
-            foreach (var drawableMesh in Meshes)
-            {
-                foreach (var group in drawableMesh.Mesh.PolygonGroups)
-                {
-                    RenderMaterials(shader, drawableMesh.Mesh, group, group.Material);
-                    OnMeshDraw(drawableMesh, group);
-                }
-            }
-        }
-
-        private void SetDefaultUniforms(ShaderProgram shader)
+        public void SetDefaultUniforms(ShaderProgram shader)
         {
             shader.SetBoolToInt("hasDiffuse", false);
+            shader.SetBoolToInt("renderVertColor", true);
         }
 
         public virtual void RenderMaterials(ShaderProgram shader, 
-            STGenericMesh mesh,  STPolygonGroup group, STGenericMaterial material)
+            STGenericMesh mesh,  STPolygonGroup group, STGenericMaterial material, Vector4 highlight_color)
         {
-            if (material == null) return;
+            shader.SetVector4("highlight_color", highlight_color);
 
             SetDefaultUniforms(shader);
+            if (material == null) return;
 
             int textureUintID = 1;
             foreach (var textureMap in material.TextureMaps)
@@ -96,6 +97,9 @@ namespace Toolbox.Core.OpenGL
                     break;
                 case STPrimitiveType.Lines:
                     mode = PrimitiveType.Lines;
+                    break;
+                case STPrimitiveType.LineLoop:
+                    mode = PrimitiveType.LineLoop;
                     break;
                 case STPrimitiveType.Points:
                     mode = PrimitiveType.Points;
@@ -135,6 +139,7 @@ namespace Toolbox.Core.OpenGL
             uniform sampler2D tex_Diffuse;
 
             uniform int hasDiffuse;
+            uniform int renderVertColor;
 
             in vec2 f_texcoord0;
             in vec3 fragPosition;
@@ -142,7 +147,7 @@ namespace Toolbox.Core.OpenGL
             in vec4 vertexColor;
             in vec3 normal;
 
-            out vec4 fragOutput;
+            out vec4 FragColor;
 
             void main(){
                 vec3 displayNormal = (normal.xyz * 0.5) + 0.5;
@@ -155,7 +160,13 @@ namespace Toolbox.Core.OpenGL
                 float halfLambert = max(displayNormal.y,0.5);
                 vec4 colorComb = vec4(color.rgb * (1-hc_a) + highlight_color.rgb * hc_a, color.a);
 
-                 fragOutput = vec4(displayNormal, 1) * colorComb * vertexColor;
+	            vec3 lightDir = vec3(0, 1, 0.5f);
+	            float light = 0.6 + abs(dot(normal, lightDir)) * 0.5;
+
+                FragColor = vec4(colorComb.rgb * light, colorComb.a) * vec4(vec3(0.6), 1);
+
+                if (renderVertColor == 1)
+                    FragColor *= min(vertexColor, vec4(1));
             }";
 
         private static string VertexShaderBasic = @"
@@ -167,6 +178,7 @@ namespace Toolbox.Core.OpenGL
             layout(location = 3) in vec4 vColor;
             layout(location = 4) in vec4 vBone;
             layout(location = 5) in vec4 vWeight;
+
 
             uniform mat4 mtxMdl;
             uniform mat4 mtxCam;
@@ -212,7 +224,7 @@ namespace Toolbox.Core.OpenGL
             vao.AddAttribute(2, 2, VertexAttribPointerType.Float, false, 68, 24);
             vao.AddAttribute(3, 4, VertexAttribPointerType.UnsignedByte, true, 68, 32);
             vao.AddAttribute(4, 4, VertexAttribPointerType.Int, false, 68, 36);
-            vao.AddAttribute(4, 4, VertexAttribPointerType.Float, false, 68, 52);
+            vao.AddAttribute(5, 4, VertexAttribPointerType.Float, false, 68, 52);
 
             vao.Initialize();
         }
@@ -225,6 +237,8 @@ namespace Toolbox.Core.OpenGL
             GL.BufferData(BufferTarget.ElementArrayBuffer, indexData.Length * sizeof(int), indexData, BufferUsageHint.StaticDraw);
 
             float[] data = CreateVertexBuffer(Mesh);
+            Console.WriteLine($"Vertex data {data.Length}");
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vaoBuffer);
             GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * data.Length, data, BufferUsageHint.StaticDraw);
 
@@ -243,6 +257,7 @@ namespace Toolbox.Core.OpenGL
         private float[] CreateVertexBuffer(STGenericMesh mesh)
         {
             List<float> list = new List<float>();
+            Console.WriteLine($"Vertex Count {mesh.Vertices.Count}");
             for (int i = 0; i < mesh.Vertices.Count; i++)
             {
                 list.Add(mesh.Vertices[i].Position.X);
@@ -264,6 +279,9 @@ namespace Toolbox.Core.OpenGL
                 }
 
                 Vector4 color = new Vector4(255,255,255,255);
+                if (mesh.Vertices[i].Colors.Length > 0)
+                   color = mesh.Vertices[i].Colors[0] * 255;
+
                 list.Add(BitConverter.ToSingle(new byte[4]
                 {
                     (byte)color.X,
@@ -274,10 +292,11 @@ namespace Toolbox.Core.OpenGL
 
                 for (int j = 0; j < 4; j++)
                 {
+                    int index = -1;
                     if (mesh.Vertices[i].BoneIndices.Count > j)
-                        list.Add(mesh.Vertices[i].BoneIndices[j]);
-                    else
-                        list.Add(-1);
+                        index = mesh.Vertices[i].BoneIndices[j];
+
+                    list.Add(Convert.ToSingle(index));
                 }
                 for (int j = 0; j < 4; j++)
                 { 

@@ -7,10 +7,19 @@ namespace Toolbox.Core
 {
     public class FileManager
     {
+        public static IFileIconLoader[] GetFileIconLoaders()
+        {
+            List<IFileIconLoader> types = new List<IFileIconLoader>();
+            foreach (var plugin in PluginManager.LoadPlugins())
+                types.AddRange(plugin.FileIconLoaders);
+
+            return types.ToArray();
+        }
+
         public static ICompressionFormat[] GetCompressionFormats()
         {
             List<ICompressionFormat> types = new List<ICompressionFormat>();
-            foreach (var plugin in PluginManager.LoadPlugins(true))
+            foreach (var plugin in PluginManager.LoadPlugins())
                 types.AddRange(plugin.CompressionFormats);
 
             return types.ToArray();

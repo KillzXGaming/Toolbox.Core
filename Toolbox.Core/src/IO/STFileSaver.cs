@@ -25,14 +25,8 @@ namespace Toolbox.Core.IO
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            if (fileFormat.FileInfo.Compression != null)
-            {
-                Stream mem = new MemoryStream();
-                fileFormat.Save(mem);
-                mem = CompressFile(mem, fileFormat);
-                File.WriteAllBytes(fileName, mem.ToArray());
-            }
-            else if (fileFormat.FileInfo.KeepOpen && File.Exists(fileName))
+
+            if (fileFormat.FileInfo.KeepOpen && File.Exists(fileName))
             {
                 string savedPath = Path.GetDirectoryName(fileName);
                 string tempPath = Path.Combine(savedPath, "tempST.bin");
@@ -41,6 +35,12 @@ namespace Toolbox.Core.IO
                 using (var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))
                 {
                     fileFormat.Save(fileStream);
+                    if (fileFormat.FileInfo.Compression != null)
+                    {
+                        Stream comp = CompressFile(File.OpenRead(tempPath), fileFormat);
+                        //fileStream.CopyTo(comp);
+                    }
+
                     if (fileFormat is IDisposable)
                         ((IDisposable)fileFormat).Dispose();
 
@@ -52,6 +52,13 @@ namespace Toolbox.Core.IO
 
                     fileFormat.Load(File.OpenRead(fileName));
                 }
+            }
+            else if (fileFormat.FileInfo.Compression != null)
+            {
+                Stream mem = new MemoryStream();
+                fileFormat.Save(mem);
+                mem = CompressFile(mem, fileFormat);
+                File.WriteAllBytes(fileName, mem.ToArray());
             }
             else
             {
@@ -73,9 +80,9 @@ namespace Toolbox.Core.IO
         /// <param name="fileFormat"></param>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static SaveLog SaveFileFormat(IFileFormat fileFormat, Stream stream)
+        public static Stream SaveFileFormat(IFileFormat fileFormat)
         {
-            SaveLog log = new SaveLog();
+         //   SaveLog log = new SaveLog();
 
             Stream mem = new MemoryStream();
             fileFormat.Save(mem);
@@ -84,8 +91,7 @@ namespace Toolbox.Core.IO
                 mem = CompressFile(mem, fileFormat);
             }
 
-            mem.CopyTo(stream);
-            return log;
+            return mem;
         }
 
         static Stream CompressFile(Stream mem, IFileFormat fileFormat)

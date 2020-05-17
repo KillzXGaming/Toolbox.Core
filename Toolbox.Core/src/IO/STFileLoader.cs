@@ -102,6 +102,8 @@ namespace Toolbox.Core.IO
             stream.Position = streamStartPos;
             foreach (IFileFormat fileFormat in FileManager.GetFileFormats())
             {
+                Console.WriteLine($"fileFormat {fileFormat}!");
+
                 //Set the file name so we can check it's extension in the identifier. 
                 //Most is by magic but some can be extension or name.
 

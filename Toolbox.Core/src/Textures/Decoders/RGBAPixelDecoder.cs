@@ -39,9 +39,13 @@ namespace Toolbox.Core.Imaging
             {
                 case TexFormat.L8:
                 case TexFormat.LA4:
+                case TexFormat.RGB8_UNORM:
+                case TexFormat.RGB8_SRGB:
                 case TexFormat.RGBA8_UNORM:
                 case TexFormat.RGBA8_SRGB:
-                case TexFormat.B5G6R5_UNORM:
+                case TexFormat.BGRA8_UNORM:
+                case TexFormat.BGRA8_SRGB:
+                case TexFormat.BGR565_UNORM:
                 case TexFormat.RGB565_UNORM:
                 case TexFormat.RGB5_UNORM:
                 case TexFormat.RGBA4_UNORM:
@@ -71,7 +75,7 @@ namespace Toolbox.Core.Imaging
                     comp[0] = (byte)((pixel & 0xF) * 17);
                     comp[1] = (byte)(((pixel & 0xF0) >> 4) * 17);
                     break;
-                case TexFormat.B5G6R5_UNORM:
+                case TexFormat.BGR565_UNORM:
                     comp[2] = Convert5To8((byte)((pixel >> 11) & 0x1F));
                     comp[1] = Convert6To8((byte)((pixel >> 5) & 0x3F));
                     comp[0] = Convert5To8((byte)(pixel & 0x1F));
@@ -145,15 +149,28 @@ namespace Toolbox.Core.Imaging
                     comp[1] = (byte)(pixel & 0xFF);
                     comp[2] = (byte)(pixel & 0xFF);
                     break;
+                case TexFormat.RGB8_UNORM:
+                case TexFormat.RGB8_SRGB:
+                    comp[2] = (byte)(pixel & 0xFF);
+                    comp[1] = (byte)((pixel & 0xFF00) >> 8);
+                    comp[0] = (byte)((pixel & 0xFF0000) >> 16);
+                    comp[3] = (byte)(0xFF);
+                    break;
                 case TexFormat.RGBA8_SINT:
                 case TexFormat.RGBA8_UINT:
                 case TexFormat.RGBA8_UNORM:
                 case TexFormat.RGBA8_SRGB:
+                case TexFormat.BGRA8_UNORM:
+                case TexFormat.BGRA8_SRGB:
                     comp[0] = (byte)(pixel & 0xFF);
                     comp[1] = (byte)((pixel & 0xFF00) >> 8);
                     comp[2] = (byte)((pixel & 0xFF0000) >> 16);
                     comp[3] = (byte)((pixel & 0xFF000000) >> 24);
                     break;
+            }
+
+            if (format.ToString().StartsWith("BGR")) {
+                return new byte[4] { comp[1],comp[0],comp[2],comp[3] };
             }
 
             return comp;

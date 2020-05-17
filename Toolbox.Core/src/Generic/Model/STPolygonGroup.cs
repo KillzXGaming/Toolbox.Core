@@ -16,6 +16,12 @@ namespace Toolbox.Core
         public int MaterialIndex { get; set; }
 
         /// <summary>
+        /// Determines the draw order for the polygon group.
+        /// Transparent passes are drawn after opaque in another pass.
+        /// </summary>
+        public bool IsTransparentPass { get; set; }
+
+        /// <summary>
         /// Gets or sets the <see cref="STGenericMaterial"/> 
         /// which determines how the mesh will be rendered.
         /// </summary>

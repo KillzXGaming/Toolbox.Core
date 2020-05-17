@@ -10,7 +10,15 @@ namespace Toolbox.Core.Collada
 {
     public class ColladaReader
     {
-        public static STGenericScene Read(string fileName, DAE.ImportSettings settings = null)
+        public static STGenericScene Read(string fileName, DAE.ImportSettings settings = null) {
+            return Read(COLLADA.Load(fileName), settings);
+        }
+
+        public static STGenericScene Read(System.IO.Stream stream, DAE.ImportSettings settings = null) {
+            return Read(COLLADA.Load(stream), settings);
+        }
+
+        static STGenericScene Read(COLLADA collada, DAE.ImportSettings settings)
         {
             if (settings == null) settings = new DAE.ImportSettings();
 
@@ -18,8 +26,6 @@ namespace Toolbox.Core.Collada
             sw.Start();
 
             STGenericScene Scene = new STGenericScene();
-
-            COLLADA collada = COLLADA.Load(fileName);
             ColladaScene colladaScene = new ColladaScene(collada, settings);
 
             //Usually there is only one scene, but it can be possible some tools use multiple per model
@@ -30,7 +36,8 @@ namespace Toolbox.Core.Collada
                 Node Root = LoadScene(scene, model, colladaScene);
                 Scene.Models.Add(model);
 
-                if (colladaScene.materials != null) {
+                if (colladaScene.materials != null)
+                {
                     foreach (var mat in colladaScene.materials.material)
                         model.Materials.Add(LoadMaterial(colladaScene, mat));
                 }
@@ -40,25 +47,26 @@ namespace Toolbox.Core.Collada
                 if (model.Skeleton.Bones.Count == 0)
                     model.Skeleton.Bones.Add(new STBone(model.Skeleton, "root"));
 
-                if (settings.FixDuplicateNames) {
+                if (settings.FixDuplicateNames)
+                {
                     //Adjust duplicate names
-                /*    foreach (var mesh in model.Meshes)
-                    {
-                        var names = model.Meshes.Select(x => x.Name).ToList();
-                        mesh.Name = Utility.RenameDuplicateString(names, mesh.Name, 0, 2);
-                    }
+                    /*    foreach (var mesh in model.Meshes)
+                        {
+                            var names = model.Meshes.Select(x => x.Name).ToList();
+                            mesh.Name = Utility.RenameDuplicateString(names, mesh.Name, 0, 2);
+                        }
 
-                    foreach (var mat in model.Materials)
-                    {
-                        var names = model.Materials.Select(x => x.Name).ToList();
-                        mat.Name = Utility.RenameDuplicateString(names, mat.Name, 0, 2);
-                    }
+                        foreach (var mat in model.Materials)
+                        {
+                            var names = model.Materials.Select(x => x.Name).ToList();
+                            mat.Name = Utility.RenameDuplicateString(names, mat.Name, 0, 2);
+                        }
 
-                    foreach (var bone in model.Skeleton.Bones)
-                    {
-                        var names = model.Skeleton.Bones.Select(x => x.Name).ToList();
-                        bone.Name = Utility.RenameDuplicateString(names, bone.Name, 0, 2);
-                    }*/
+                        foreach (var bone in model.Skeleton.Bones)
+                        {
+                            var names = model.Skeleton.Bones.Select(x => x.Name).ToList();
+                            bone.Name = Utility.RenameDuplicateString(names, bone.Name, 0, 2);
+                        }*/
                 }
             }
 
@@ -67,6 +75,7 @@ namespace Toolbox.Core.Collada
 
             return Scene;
         }
+
 
         public class ColladaScene
         {
@@ -122,8 +131,14 @@ namespace Toolbox.Core.Collada
                 if (scene.effectLookup.ContainsKey(effectid))
                 {
                     var effect = scene.effectLookup[effectid];
+                    if (effect.Items == null)
+                        return mat;
+
                     foreach (var item in effect.Items)
                     {
+                        if (item.Items == null)
+                            continue;
+
                         foreach (var param in item.Items)
                         {
                             if (param is common_newparam_type) {
@@ -136,7 +151,6 @@ namespace Toolbox.Core.Collada
                                     {
                                         Name = name,
                                     });
-                                    Console.WriteLine($"tex {name}");
                                 }
                             }
 
@@ -216,10 +230,14 @@ namespace Toolbox.Core.Collada
             STBone bone = new STBone(model.Skeleton, daeNode.name);
             model.Skeleton.Bones.Add(bone);
 
-            bone.Transform = DaeUtility.GetMatrix(daeNode.Items) * parentTransform;
+            var transform = DaeUtility.GetMatrix(daeNode.Items) * parentTransform;
+            bone.Position = transform.ExtractTranslation();
+            bone.Scale = transform.ExtractScale();
+            bone.Rotation = transform.ExtractRotation();
             bone.Parent = boneParent;
             Console.WriteLine("NODE " + bone.Name + " " + bone.Transform);
 
+            //Reset the parent transform for children. We only need to apply the parent root transform 
             parentTransform = Matrix4.Identity;
 
             if (daeNode.node1 != null)

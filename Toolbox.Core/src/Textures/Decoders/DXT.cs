@@ -140,8 +140,9 @@ namespace Toolbox.Core.TextureDecoding
                 }
             }
 
-            return Output;
+            return ImageUtility.ConvertBgraToRgba(Output);
         }
+
         public static byte[] DecompressBC4(Byte[] data, int width, int height, bool IsSNORM)
         {
             int W = (width + 3) / 4;
@@ -243,7 +244,6 @@ namespace Toolbox.Core.TextureDecoding
                         {
                             for (int TX = 0; TX < TW; TX++)
                             {
-
                                 int Shift = TY * 12 + TX * 3;
                                 int OOffset = ((Y * 4 + TY) * width + (X * 4 + TX)) * 4;
 
@@ -262,7 +262,7 @@ namespace Toolbox.Core.TextureDecoding
 
                                 Output[OOffset + 0] = Clamp((NX + 1) * 0.5f);
                                 Output[OOffset + 1] = Clamp((NY + 1) * 0.5f);
-                                Output[OOffset + 2] = Clamp((NZ + 1) * 0.5f);
+                                Output[OOffset + 2] = 0;
                                 Output[OOffset + 3] = 0xff;
                             }
                         }
@@ -410,24 +410,17 @@ namespace Toolbox.Core.TextureDecoding
 
         private static void CalculateBC3AlphaS(byte[] Alpha)
         {
-            for (int i = 2; i < 8; i++)
+            if ((sbyte)Alpha[0] > (sbyte)Alpha[1])
             {
-                if ((sbyte)Alpha[0] > (sbyte)Alpha[1])
-                {
-                    Alpha[i] = (byte)(((8 - i) * (sbyte)Alpha[0] + (i - 1) * (sbyte)Alpha[1]) / 7);
-                }
-                else if (i < 6)
-                {
-                    Alpha[i] = (byte)(((6 - i) * (sbyte)Alpha[0] + (i - 1) * (sbyte)Alpha[1]) / 7);
-                }
-                else if (i == 6)
-                {
-                    Alpha[i] = 0x80;
-                }
-                else /* i == 7 */
-                {
-                    Alpha[i] = 0x7f;
-                }
+                for (int i = 2; i < 8; i++)
+                    Alpha[i] = (byte)(Alpha[0] + (((sbyte)Alpha[1] - (sbyte)Alpha[0]) * (i - 1)) / 7);
+            }
+            else
+            {
+                for (int i = 2; i < 6; i++)
+                    Alpha[i] = (byte)(Alpha[0] + (((sbyte)Alpha[1] - (sbyte)Alpha[0]) * (i - 1)) / 5);
+                Alpha[6] = 0x80;
+                Alpha[7] = 0x7f;
             }
         }
 

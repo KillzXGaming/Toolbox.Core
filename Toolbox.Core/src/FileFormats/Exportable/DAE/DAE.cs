@@ -22,6 +22,8 @@ namespace Toolbox.Core.Collada
             public bool OnlyExportRiggedBones = false;
             public bool TransformColorUVs = false;
 
+            public bool UseTextureChannelComponents = true;
+
             public Version FileVersion = new Version();
 
             public ProgramPreset Preset = ProgramPreset.NONE;
@@ -48,6 +50,9 @@ namespace Toolbox.Core.Collada
             public int Micro = 1;
         }
 
+        public static STGenericScene Read(System.IO.Stream stream, DAE.ImportSettings settings = null) {
+            return ColladaReader.Read(stream, settings);
+        }
 
         public static STGenericScene Read(string fileName, DAE.ImportSettings settings = null) {
             return ColladaReader.Read(fileName, settings);

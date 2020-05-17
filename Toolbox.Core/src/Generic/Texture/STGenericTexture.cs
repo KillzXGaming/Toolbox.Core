@@ -232,7 +232,12 @@ namespace Toolbox.Core
         {
             foreach (var format in FileManager.GetExportableTextures())
             {
+                Console.WriteLine($"exportable as {format.IdentifyExport(Utils.GetExtension(filePath))} ext {Utils.GetExtension(filePath)}");
 
+              if (format.IdentifyExport(Utils.GetExtension(filePath))) {
+                    format.Export(this, settings, filePath);
+                    break;
+                }
             }
         }
 
@@ -277,8 +282,6 @@ namespace Toolbox.Core
 
             if (Platform.OutputFormat != TexFormat.RGBA8_UNORM)
                 data = DecodeBlock(data, width, height, Platform.OutputFormat);
-            else
-                data = ImageUtility.ConvertBgraToRgba(data);
 
             return BitmapExtension.CreateBitmap(data, (int)width, (int)height);
         }
@@ -287,13 +290,9 @@ namespace Toolbox.Core
             byte[] output = new byte[0];
             foreach (var decoder in FileManager.GetTextureDecoders())
             {
-                Console.WriteLine($"decoder {decoder}");
-
                 bool isDecoded = decoder.Decode(format, data, (int)width, (int)height, out output);
                 if (isDecoded)
                     return output != null ? ImageUtility.ConvertBgraToRgba(output) : new byte[0];
-
-             //   return ImageUtility.ConvertBgraToRgba(output);
             }
             return output != null ? ImageUtility.ConvertBgraToRgba(output) : new byte[0];
         }
@@ -314,6 +313,18 @@ namespace Toolbox.Core
         {
             var format = Platform.OutputFormat;
             return TextureFormatHelper.GetBlockDepth(format);
+        }
+
+        public bool IsBCNCompressed()
+        {
+            var format = Platform.OutputFormat;
+            return TextureFormatHelper.IsBCNCompressed(format);
+        }
+
+        public bool IsASTC()
+        {
+            var format = Platform.OutputFormat;
+            return format.ToString().StartsWith("ASTC");
         }
 
         /// <summary>
@@ -347,7 +358,7 @@ namespace Toolbox.Core
                     uint height = (uint)Math.Max(1, Height >> mipLevel);
 
                     uint size = width * height * bpp;
-                    if (format is BCN)
+                    if (IsBCNCompressed())
                     {
                         size = ((width + 3) >> 2) * ((Height + 3) >> 2) * bpp;
                         if (size < bpp)

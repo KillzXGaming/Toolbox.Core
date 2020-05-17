@@ -48,5 +48,20 @@ namespace Toolbox.Core
         /// The extension of the file.
         /// </summary>
         public string Extension => Utils.GetExtension(FileName);
+
+        /// <summary>
+        /// Gets the folder the file or archive file is located in.
+        /// </summary>
+        public string FolderPath {
+            get { return System.IO.Path.GetDirectoryName(GetSourcePath(this)); }
+        }
+
+        static string GetSourcePath(File_Info fileInfo)
+        {
+            if (fileInfo.ParentArchive != null)
+                return GetSourcePath(((IFileFormat)fileInfo.ParentArchive).FileInfo);
+
+            return fileInfo.FilePath;
+        }
     }
 }

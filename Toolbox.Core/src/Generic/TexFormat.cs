@@ -102,7 +102,7 @@ namespace Toolbox.Core
         BC5_TYPELESS = 82,
         BC5_UNORM = 83,
         BC5_SNORM = 84,
-        B5G6R5_UNORM = 85,
+        BGR565_UNORM = 85,
         BGR5A1_UNORM = 86,
         BGRA8_UNORM = 87,
         BGRX8_UNORM = 88,
@@ -192,5 +192,7 @@ namespace Toolbox.Core
         RGB5A1_UNORM = 252,
         RGB5_UNORM = 253,
         RGBA4_UNORM,
+        RGB8_UNORM,
+        RGB8_SRGB,
     }
 }

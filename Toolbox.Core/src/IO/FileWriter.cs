@@ -118,6 +118,9 @@ namespace Toolbox.Core.IO
         public void WriteString(string text, uint fixedSize, Encoding encoding = null)
         {
             long pos = Position;
+            Write(new byte[fixedSize]);
+
+            SeekBegin(pos);
             WriteString(text, encoding);
             SeekBegin(pos + fixedSize);
         }
@@ -193,6 +196,22 @@ namespace Toolbox.Core.IO
             Write(v.Y);
             Write(v.Z);
             Write(v.W);
+        }
+
+        /// <summary>
+        /// Aligns the data by writing bytes (rather than seeking)
+        /// </summary>
+        /// <param name="alignment"></param>
+        /// <param name="value"></param>
+        public void FillBytes(int amount, byte value = 0x00)
+        {
+            var startPos = Position;
+            long position = Seek(amount, SeekOrigin.Current);
+
+            Seek(startPos, System.IO.SeekOrigin.Begin);
+            while (Position != position) {
+                Write(value);
+            }
         }
 
         /// <summary>

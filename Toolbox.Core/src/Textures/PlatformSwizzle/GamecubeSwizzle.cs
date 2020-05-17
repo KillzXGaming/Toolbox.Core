@@ -15,14 +15,25 @@ namespace Toolbox.Core.Imaging
             return $"{Format}" + (PaletteData.Length > 0 ? $"_p_{PaletteFormat}" : "");
         }
 
-        public ushort[] PaletteData { get; set; }
+        public ushort[] PaletteData { get; set; } = new ushort[0];
+
+        public void SetPalette(byte[] palette, Decode_Gamecube.PaletteFormats format) {
+            PaletteFormat = format;
+            using (var reader = new Toolbox.Core.IO.FileReader(palette)) {
+                PaletteData = reader.ReadUInt16s(palette.Length / 2);
+            }
+        }
+
+        public void SetPalette(ushort[] palette, Decode_Gamecube.PaletteFormats format) {
+            PaletteFormat = format;
+            PaletteData = palette;
+        }
 
         public GamecubeSwizzle() { }
 
         public GamecubeSwizzle(Decode_Gamecube.TextureFormats format)
         {
             Format = format;
-            PaletteData = new ushort[0];
         }
 
         public GamecubeSwizzle(Decode_Gamecube.TextureFormats format, Decode_Gamecube.PaletteFormats paletteFormat) {

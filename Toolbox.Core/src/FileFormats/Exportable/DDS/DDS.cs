@@ -10,6 +10,8 @@ namespace Toolbox.Core
 {
     public class DDS : STGenericTexture, IFileFormat, IExportableTexture
     {
+        public bool IdentifyExport(string ext) { return ext == ".dds" || ext == ".dds2"; }
+
         public bool CanSave { get; set; } = true;
 
         public string[] Description { get; set; } = new string[] { "DDS" };
@@ -314,16 +316,48 @@ namespace Toolbox.Core
                 reader.TemporarySeek((int)(4 + MainHeader.Size + Dx10Size), SeekOrigin.Begin);
                 ImageData = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
 
+                byte[] Components = new byte[4] { 0, 1, 2, 3 };
+
+                bool Compressed = false;
+                bool HasLuminance = false;
+                bool HasAlpha = false;
+                bool IsRGB = false;
+
+                switch (PfHeader.Flags)
+                {
+                    case 4:
+                        Compressed = true;
+                        break;
+                    case 2:
+                    case (uint)DDPF.LUMINANCE:
+                        HasLuminance = true;
+                        break;
+                    case (uint)DDPF.RGB:
+                        IsRGB = true;
+                        break;
+                    case 0x41:
+                        IsRGB = true;
+                        HasAlpha = true;
+                        break;
+                }
+
                 ToGenericFormat();
+
+                if (!IsDX10 && !this.IsBCNCompressed()) {
+                    Platform.OutputFormat = DDS_RGBA.GetUncompressedType(this, Components, IsRGB, HasAlpha, HasLuminance, PfHeader);
+                }
+
+                Depth = 1;
                 Width = MainHeader.Width;
                 Height = MainHeader.Height;
-                MipCount = MainHeader.MipCount;
+                MipCount = MainHeader.MipCount == 0 ? 1 : MainHeader.MipCount;
                 ArrayCount = IsCubeMap ? (uint)6 : 1;
             }
         }
 
         public override byte[] GetImageData(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0) {
-            return ImageData;
+            var surfaces = DDSHelper.GetArrayFaces(this, ArrayCount, DepthLevel);
+            return surfaces[ArrayLevel].mipmaps[MipLevel];
         }
 
         public override void SetImageData(List<byte[]> imageData, uint width, uint height, int arrayLevel = 0)

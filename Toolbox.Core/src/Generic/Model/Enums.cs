@@ -16,6 +16,7 @@ namespace Toolbox.Core
         QuadStrips,
         Points,
         Lines,
+        LineLoop,
     }
 
     /// <summary>

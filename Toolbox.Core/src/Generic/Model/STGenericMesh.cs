@@ -52,6 +52,8 @@ namespace Toolbox.Core
         /// </summary>
         public uint VertexSkinCount { get; set; }
 
+        public ModelTransform Transform { get; set; } = new ModelTransform();
+
         #region methods
 
         /// <summary>

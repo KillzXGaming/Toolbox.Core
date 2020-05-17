@@ -9,6 +9,6 @@ namespace Toolbox.Core
     /// </summary>
     public interface IModelContainer
     {
-        IEnumerable<STGenericModel> ModelList { get; }
+        IEnumerable<IModelFormat> ModelList { get; }
     }
 }

@@ -8,6 +8,8 @@ namespace Toolbox.Core
 {
     public class ASTC : STGenericTexture, IFileFormat, IExportableTexture
     {
+        public bool IdentifyExport(string ext) { return ext == ".astc"; }
+
         const int MagicFileConstant = 0x5CA1AB13;
 
         public bool CanSave { get; set; } = true;

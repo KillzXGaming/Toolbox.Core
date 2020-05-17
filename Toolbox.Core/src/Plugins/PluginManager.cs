@@ -19,7 +19,8 @@ namespace Toolbox.Core
             public List<IExportableAnimation> ExportableAnimations = new List<IExportableAnimation>();
             public List<IExportableTexture> ExportableTextures = new List<IExportableTexture>();
             public List<ITextureDecoder> TextureDecoders = new List<ITextureDecoder>();
-
+            public List<IFileIconLoader> FileIconLoaders = new List<IFileIconLoader>();
+            
             public IPlugin PluginHandler;
         }
 
@@ -96,7 +97,10 @@ namespace Toolbox.Core
             Type compressionType = typeof(ICompressionFormat);
             Type fileEditorType = typeof(IFileEditor);
             Type textureDecoderType = typeof(ITextureDecoder);
+            Type fileIconLoaderType = typeof(IFileIconLoader);
+            Type exportableTexType = typeof(IExportableTexture);
 
+            
             PluginInstance plugin = new PluginInstance();
 
             if (assembly != null)
@@ -131,6 +135,14 @@ namespace Toolbox.Core
                             if (type.GetInterface(textureDecoderType.FullName) != null)
                             {
                                 plugin.TextureDecoders.Add((ITextureDecoder)Activator.CreateInstance(type));
+                            }
+                            if (type.GetInterface(fileIconLoaderType.FullName) != null)
+                            {
+                                plugin.FileIconLoaders.Add((IFileIconLoader)Activator.CreateInstance(type));
+                            }
+                            if (type.GetInterface(exportableTexType.FullName) != null)
+                            {
+                                plugin.ExportableTextures.Add((IExportableTexture)Activator.CreateInstance(type));
                             }
                         }
                     }

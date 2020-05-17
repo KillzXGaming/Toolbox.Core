@@ -305,7 +305,11 @@ namespace Toolbox.Core
         }
 
         private byte[] TryDecodeSurface(byte[] imageData, uint width, uint height, STGenericTexture texture) {
-            return STGenericTexture.DecodeBlock(imageData, width, height, texture.Platform.OutputFormat);
+            imageData = texture.Platform.DecodeImage(texture, imageData, width, height, 0, 0);
+            if (texture.Platform.OutputFormat != TexFormat.RGBA8_UNORM)
+                return STGenericTexture.DecodeBlock(imageData, width, height, texture.Platform.OutputFormat);
+            else
+                return imageData;
         }
 
         public static int GenerateOpenGLTexture(RenderableTex t, Bitmap bitmap, bool generateMips = false)

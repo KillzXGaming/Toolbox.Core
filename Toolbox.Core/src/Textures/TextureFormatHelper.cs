@@ -61,6 +61,7 @@ namespace Toolbox.Core
             { "RGBA32",    new FormatInfo(16, 1,  1, 1, TargetBuffer.Color) },
             { "RGBA16",    new FormatInfo(8, 1,  1, 1, TargetBuffer.Color) },
             { "RGBA8",     new FormatInfo(4, 1,  1, 1, TargetBuffer.Color) },
+            { "RGB8",      new FormatInfo(3, 1,  1, 1, TargetBuffer.Color) },
             { "RGBA4",     new FormatInfo(2, 1,  1, 1, TargetBuffer.Color) },
             { "RGB32",     new FormatInfo(8, 1,  1, 1, TargetBuffer.Color) },
             { "RG32",      new FormatInfo(8, 1,  1, 1, TargetBuffer.Color) },

@@ -47,6 +47,16 @@ namespace Toolbox.Core
         /// </summary>
         public static bool EnableDragDrop = true;
 
+        public static float BonePointSize { get; set; } = 0.1f;
+
+        public static int SelectedBoneIndex { get; set; } = -1;
+
+        public static float Preview3DScale { get; set; } = 1.0f;
+
+        public static bool DisplayBones { get; set; } = true;
+
+        public static List<ModelContainer> ModelContainers = new List<ModelContainer>();
+
         //GUI based editors
         //While multiple GUI frameworks can be used, they should still share the same editors
 
@@ -61,6 +71,24 @@ namespace Toolbox.Core
             /// Determines the state the window is currently in and to load as on boot.
             /// </summary>
             public static bool MaximizeWindow = false;
+
+            /// <summary>
+            /// The default extension used for the image when exporting.
+            /// </summary>
+            public static string DefaultImageExt = ".png";
+        }
+
+        public class BackgroundSettings
+        {
+            public static Color backgroundGradientTop = Color.FromArgb(255, 26, 26, 26);
+            public static Color backgroundGradientBottom = Color.FromArgb(255, 77, 77, 77);
+        }
+
+        public class GridSettings
+        {
+            public static float CellSize = 1.0f;
+            public static uint CellAmount = 10;
+            public static Color color = Color.FromArgb(90, 90, 90);
         }
 
         public class ObjectEditor

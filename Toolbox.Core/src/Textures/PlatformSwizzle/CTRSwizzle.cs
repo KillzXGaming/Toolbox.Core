@@ -15,6 +15,10 @@ namespace Toolbox.Core.Imaging
             Format = format;
         }
 
+        public override string ToString() {
+            return Format.ToString();
+        }
+
         public byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
             var settings = new CTR_3DS.SwizzleSettings()
             {
