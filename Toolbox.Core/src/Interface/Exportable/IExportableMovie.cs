@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Toolbox.Core
 {
-    public class RGBAConverter
+    public interface IExportableMovie
     {
-
+        void Export(IModelFormat fileFormat, string filePath);
     }
 }

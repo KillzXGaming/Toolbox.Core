@@ -23,5 +23,9 @@ namespace Toolbox.Core.Imaging
         public byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
             return Nitro.NitroTex.DecodeTexture((int)width, (int)height, Format, data, texture.GetPaletteData(), isColor0);
         }
+
+        public byte[] EncodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
+            return null;
+        }
     }
 }

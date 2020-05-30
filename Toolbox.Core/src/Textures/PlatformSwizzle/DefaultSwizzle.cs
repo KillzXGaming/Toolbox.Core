@@ -17,5 +17,9 @@ namespace Toolbox.Core.Imaging
         public byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
             return data;
         }
+
+        public byte[] EncodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
+            return null;
+        }
     }
 }

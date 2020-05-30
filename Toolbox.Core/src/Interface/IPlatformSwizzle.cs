@@ -9,5 +9,6 @@ namespace Toolbox.Core.Imaging
         TexFormat OutputFormat { get; set; }
 
         byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip);
+        byte[] EncodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip);
     }
 }

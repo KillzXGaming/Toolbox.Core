@@ -69,6 +69,10 @@ namespace Toolbox.Core.Imaging
             return GX2.Decode(surf, array, mip);
         }
 
+        public byte[] EncodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
+            return null;
+        }
+
         static Dictionary<GX2.GX2SurfaceFormat, TexFormat> FormatList = new Dictionary<GX2.GX2SurfaceFormat, TexFormat>()
         {
             { GX2.GX2SurfaceFormat.TC_R8_UNORM, TexFormat.RGBA8_UNORM },

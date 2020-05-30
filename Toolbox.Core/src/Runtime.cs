@@ -32,10 +32,28 @@ namespace Toolbox.Core
         /// </summary>
         public static bool RenderModels = true;
 
+        private static string executableDir;
+
         /// <summary>
         /// The directory the program is located in.
         /// </summary>
-        public static string ExecutableDir;
+        public static string ExecutableDir
+        {
+            get {
+                if (executableDir == null)
+                    executableDir = FindExecutableDir();
+
+                return executableDir; }
+            set
+            {
+                executableDir = value;
+            }
+        }
+
+        private static string FindExecutableDir()
+        {
+           return System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+        }
 
         /// <summary>
         /// The level of compression used for YAZ0 from 1 - 9.

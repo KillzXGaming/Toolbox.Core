@@ -112,12 +112,16 @@ namespace Toolbox.Core.OpenGL
                     break;
             }
 
+            GL.Disable(EnableCap.CullFace);
+
             msh.vao.Enable();
             msh.vao.Use();
             GL.DrawElements(mode,
                 group.Faces.Count,
                 DrawElementsType.UnsignedInt,
                 group.FaceOffset);
+
+            GL.Enable(EnableCap.CullFace);
         }
 
         public virtual void PrepareShaders()
@@ -153,7 +157,7 @@ namespace Toolbox.Core.OpenGL
                 vec3 displayNormal = (normal.xyz * 0.5) + 0.5;
                 float hc_a   = highlight_color.w;
 
-                vec4 color = vec4(1);
+                vec4 color = vec4(0.9f);
                 if (hasDiffuse == 1)
                     color = texture(tex_Diffuse,f_texcoord0);
 

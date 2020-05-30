@@ -34,5 +34,9 @@ namespace Toolbox.Core.Imaging
 
             return Switch.TegraX1Swizzle.GetImageData(texture, data, array, mip, 0, (uint)BlockHeightLog2, Target, LinearMode);
         }
+
+        public byte[] EncodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
+            return null;
+        }
     }
 }

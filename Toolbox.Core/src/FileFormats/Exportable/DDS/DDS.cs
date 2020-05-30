@@ -270,8 +270,8 @@ namespace Toolbox.Core
                         format = TexFormat.RGBA8_UNORM;
                         break;
                 }
-                Platform.OutputFormat = format;
             }
+            Platform.OutputFormat = format;
         }
 
         public void SetFlags(TexFormat format, bool isDX10, bool isCubemap)

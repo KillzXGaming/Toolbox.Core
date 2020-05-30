@@ -15,6 +15,11 @@ namespace Toolbox.Core
         /// </summary>
         public bool Visibile { get; set; } = true;
 
+        /// <summary>
+        /// Determines wether to open the file format automatically
+        /// </summary>
+        public bool OpenFileFormatOnLoad { get; set; }
+
         protected Stream _stream;
 
         private byte[] dataBytes;
@@ -61,8 +66,12 @@ namespace Toolbox.Core
 
         public virtual uint GetFileSize() { return 0; return (uint)FileData.Length; }
 
+        public void FileWrite(string filePath) {
+           DecompressData(FileData).SaveToFile(filePath);
+        }
+
         public Task FileWriteAsync(string filePath) {
-           return Task.Run(() => FileData.SaveToFile(filePath));
+           return Task.Run(() => DecompressData(FileData).SaveToFile(filePath));
         }
 
         public void SaveFileFormat()

@@ -74,6 +74,7 @@ namespace Toolbox.Core
             Height = (uint)bitmap.Height;
             Platform.OutputFormat = TexFormat.RGBA8_UNORM;
             MipCount = 1;
+            CanEdit = true;
         }
 
         public void Unload()

@@ -182,19 +182,21 @@ namespace Toolbox.Core.Collada
             node.Type = daeNode.type;
             node.Transform = DaeUtility.GetMatrix(daeNode.Items) * parent.Transform;
 
+            if (daeNode.instance_geometry != null)
+            {
+                geometry geom = DaeUtility.FindGeoemertyFromNode(daeNode, colladaScene.geometries);
+                model.Meshes.Add(LoadMeshData(colladaScene, node, geom, colladaScene.materials));
+            }
+            if (daeNode.instance_controller != null)
+            {
+                controller controller = DaeUtility.FindControllerFromNode(daeNode, colladaScene.controllers);
+                geometry geom = DaeUtility.FindGeoemertyFromController(controller, colladaScene.geometries);
+                model.Meshes.Add(LoadMeshData(colladaScene, node, geom, colladaScene.materials, controller));
+            }
+
             try
             {
-                if (daeNode.instance_geometry != null)
-                {
-                    geometry geom = DaeUtility.FindGeoemertyFromNode(daeNode, colladaScene.geometries);
-                    model.Meshes.Add(LoadMeshData(colladaScene, node, geom, colladaScene.materials));
-                }
-                if (daeNode.instance_controller != null)
-                {
-                    controller controller = DaeUtility.FindControllerFromNode(daeNode, colladaScene.controllers);
-                    geometry geom = DaeUtility.FindGeoemertyFromController(controller, colladaScene.geometries);
-                    model.Meshes.Add(LoadMeshData(colladaScene, node, geom, colladaScene.materials, controller));
-                }
+            
             }
             catch (Exception ex)
             {
@@ -473,6 +475,7 @@ namespace Toolbox.Core.Collada
             int numTexCoordChannels, int numColorChannels, int stride, int index, int set, string semantic)
         {
             float_array array = source.Item as float_array;
+            if (array.Values == null) return;
             switch (semantic)
             {
                 case "VERTEX":

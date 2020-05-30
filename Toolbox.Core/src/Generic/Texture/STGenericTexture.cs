@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using Toolbox.Core.Imaging;
-using Ryujinx.Graphics.Gal.Texture; //For ASTC
-using Toolbox.Core.TextureDecoding;
 
 namespace Toolbox.Core
 {
@@ -119,6 +117,11 @@ namespace Toolbox.Core
         public virtual TexFormat[] SupportedFormats => new TexFormat[0];
 
         /// <summary>
+        /// A list of external references of things like materials or animations.
+        /// </summary>
+        public virtual string[] ExternalReferences { get; }
+
+        /// <summary>
         /// Determines which component to use for the red channel.
         /// </summary>
         public STChannelType RedChannel = STChannelType.Red;
@@ -128,7 +131,6 @@ namespace Toolbox.Core
         /// Determines which component to use for the green channel.
         /// </summary>
         public STChannelType GreenChannel = STChannelType.Green;
-
 
         /// <summary>
         /// Determines which component to use for the blue channel.
@@ -201,9 +203,10 @@ namespace Toolbox.Core
             return surfaces;
         }
 
-        //
-        //Gets a list of surfaces given the start index of the array and the amount of arrays to obtain
-        //
+        /// <summary>
+        ///Gets a list of surfaces given the start index of the array and the amount of arrays to obtain
+        /// </summary>
+        /// <returns></returns>
         public List<Surface> GetSurfaces(int ArrayIndexStart = 0, bool GetAllSurfaces = true, int GetSurfaceAmount = 1)
         {
             if (GetAllSurfaces)
@@ -272,7 +275,6 @@ namespace Toolbox.Core
             uint width = Math.Max(1, Width >> MipLevel);
             uint height = Math.Max(1, Height >> MipLevel);
             byte[] data = GetImageData(ArrayLevel, MipLevel, DepthLevel);
-            byte[] paletteData = GetPaletteData();
 
             Console.WriteLine($"data {data.Length}");
             data = Platform.DecodeImage(this, data, width, height, ArrayLevel, MipLevel);
@@ -284,6 +286,15 @@ namespace Toolbox.Core
                 data = DecodeBlock(data, width, height, Platform.OutputFormat);
 
             return BitmapExtension.CreateBitmap(data, (int)width, (int)height);
+        }
+
+        public byte[] GetDeswizzledSurface(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0)
+        {
+            uint width = Math.Max(1, Width >> MipLevel);
+            uint height = Math.Max(1, Height >> MipLevel);
+            byte[] data = GetImageData(ArrayLevel, MipLevel, DepthLevel);
+
+            return Platform.DecodeImage(this, data, width, height, ArrayLevel, MipLevel);
         }
 
         public static byte[] DecodeBlock(byte[] data, uint width, uint height, TexFormat format) {

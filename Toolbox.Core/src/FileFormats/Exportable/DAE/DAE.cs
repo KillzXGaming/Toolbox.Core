@@ -87,6 +87,7 @@ namespace Toolbox.Core.Collada
             List<string> failedTextureExport = new List<string>();
 
             string TexturePath = System.IO.Path.GetDirectoryName(FileName);
+            Dictionary<string, STGenericMaterial> MaterialRemapper = new Dictionary<string, STGenericMaterial>();
 
             using (ColladaWriter writer = new ColladaWriter(FileName, settings))
             {
@@ -141,6 +142,17 @@ namespace Toolbox.Core.Collada
                     {
                         Material material = new Material();
                         material.Name = mat.Name;
+
+                        if (!MaterialRemapper.ContainsKey(mat.Name)) {
+                            MaterialRemapper.Add(mat.Name, mat);
+                        }
+                        else
+                        {
+                            string name = Utils.RenameDuplicateString(mat.Name, MaterialRemapper.Keys.ToList());
+                            MaterialRemapper.Add(name, mat);
+                            material.Name = name;
+                        }
+
                         materials.Add(material);
 
                         foreach (var tex in mat.TextureMaps)
@@ -316,7 +328,6 @@ namespace Toolbox.Core.Collada
                     // collect sources
                     List<float> Position = new List<float>();
                     List<float> Normal = new List<float>();
-                    List<float> UV0 = new List<float>();
                     List<float> UV1 = new List<float>();
                     List<float> UV2 = new List<float>();
                     List<float> UV3 = new List<float>();
@@ -390,10 +401,10 @@ namespace Toolbox.Core.Collada
                                 UV1.Add(texCoord.X); UV1.Add(texCoord.Y);
                             }
                             if (i == 1) {
-                                UV2.Add(texCoord.X); UV1.Add(texCoord.Y);
+                                UV2.Add(texCoord.X); UV2.Add(texCoord.Y);
                             }
                             if (i == 2) {
-                                UV3.Add(texCoord.X); UV1.Add(texCoord.Y);
+                                UV3.Add(texCoord.X); UV3.Add(texCoord.Y);
                             }
                         }
 
@@ -452,11 +463,21 @@ namespace Toolbox.Core.Collada
 
                             triangleLists.Add(triangleList);
 
+                            STGenericMaterial material = new STGenericMaterial();
+
                             if (group.MaterialIndex != -1 && Materials.Count > group.MaterialIndex)
-                                triangleList.Material = Materials[group.MaterialIndex].Name;
+                                material = Materials[group.MaterialIndex];
 
                             if (group.Material != null)
-                                triangleList.Material = group.Material.Name;
+                                material = group.Material;
+
+                           if (MaterialRemapper.Values.Any(x => x == material))
+                            {
+                                var key = MaterialRemapper.FirstOrDefault(x => x.Value == material).Key;
+                                triangleList.Material = key;
+                            }
+                           else if (material.Name != string.Empty)
+                                triangleList.Material = material.Name;
 
                             List<uint> faces = new List<uint>();
                             if (group.PrimitiveType == STPrimitiveType.TriangleStrips)
@@ -481,14 +502,16 @@ namespace Toolbox.Core.Collada
                     if (HasColors2)
                         writer.WriteGeometrySource(mesh.Name, SemanticType.COLOR, Color2.ToArray(), triangleLists.ToArray(), 1);
 
+                    Console.WriteLine($"HasUV0 {HasUV0} {UV1.Count}");
+
                     if (HasUV0)
-                        writer.WriteGeometrySource(mesh.Name, SemanticType.TEXCOORD, UV0.ToArray(), triangleLists.ToArray(), 0);
+                        writer.WriteGeometrySource(mesh.Name, SemanticType.TEXCOORD, UV1.ToArray(), triangleLists.ToArray(), 0);
 
                     if (HasUV1)
-                        writer.WriteGeometrySource(mesh.Name, SemanticType.TEXCOORD, UV1.ToArray(), triangleLists.ToArray(), 1);
+                        writer.WriteGeometrySource(mesh.Name, SemanticType.TEXCOORD, UV2.ToArray(), triangleLists.ToArray(), 1);
 
                     if (HasUV2)
-                        writer.WriteGeometrySource(mesh.Name, SemanticType.TEXCOORD, UV2.ToArray(), triangleLists.ToArray(), 2);
+                        writer.WriteGeometrySource(mesh.Name, SemanticType.TEXCOORD, UV3.ToArray(), triangleLists.ToArray(), 2);
 
                     if (HasBoneIds)
                         writer.AttachGeometryController(BoneIndices, BoneWeights);

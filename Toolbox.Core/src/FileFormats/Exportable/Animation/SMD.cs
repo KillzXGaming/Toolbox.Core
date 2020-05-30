@@ -23,7 +23,7 @@ namespace Toolbox.Core.Animations
 
                 animation.Frame = 0;
                 for (int i = 0; i < animation.FrameCount; i++) {
-                    animation.NextFrame();
+                    animation.UpdateFrame(i);
                     writer.WriteLine($"time {animation.StartFrame + i}");
                     foreach (STBone bone in skeleton.Bones)
                     {

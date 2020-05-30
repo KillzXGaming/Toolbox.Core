@@ -10,6 +10,8 @@ namespace Toolbox.Core.IO
     {
         public class Settings
         {
+            public Stream Stream = null;
+
             /// <summary>
             /// Keeps the file stream open.
             /// </summary>
@@ -28,6 +30,38 @@ namespace Toolbox.Core.IO
             //Keep these sizes stored for useful file information
             internal uint DecompressedSize = 0;
             internal uint CompressedSize = 0;
+        }
+
+        public static Settings TryDecompressFile(Stream stream, string fileName)
+        {
+            long streamStartPos = stream.Position;
+
+            Settings settings = new Settings();
+            settings.DecompressedSize = (uint)stream.Length;
+
+            try
+            {
+                foreach (ICompressionFormat compressionFormat in FileManager.GetCompressionFormats())
+                {
+                    stream.Position = streamStartPos;
+                    if (compressionFormat.Identify(stream, fileName))
+                    {
+                        stream.Position = streamStartPos;
+
+                        settings.CompressedSize = (uint)stream.Length;
+                        settings.Stream = compressionFormat.Decompress(stream);
+                        settings.DecompressedSize = (uint)stream.Length;
+                        settings.CompressionFormat = compressionFormat;
+                        return settings;
+                    }
+                }
+            } //It's possible some types fail to compress if identify was incorrect so we should skip any errors
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return settings;
         }
 
         /// <summary>
@@ -61,38 +95,15 @@ namespace Toolbox.Core.IO
 
             //Create settings if none set
             if (settings == null) settings = new Settings();
-            //Set the current stream as the decompressed size if a compression format is not set yet
-            if (settings.CompressionFormat == null)
-                settings.DecompressedSize = (uint)stream.Length;
 
             long streamStartPos = stream.Position;
 
-            //Try catch incase it fails, continute to load the file anyways if the check may be false 
-            try
+            //Check if the current setting has a compression format set or not
+            if (settings.CompressionFormat == null)
             {
-                //Check all supported compression formats and decompress. Then loop back
-                if (settings.CompressionFormat == null)
-                {
-                    foreach (ICompressionFormat compressionFormat in FileManager.GetCompressionFormats())
-                    {
-                        stream.Position = streamStartPos;
-                        if (compressionFormat.Identify(stream, FileName))
-                        {
-                            stream.Position = streamStartPos;
-
-                            settings.CompressedSize = (uint)stream.Length;
-                            stream = compressionFormat.Decompress(stream);
-                            settings.DecompressedSize = (uint)stream.Length;
-                            settings.CompressionFormat = compressionFormat;
-
-                            return OpenFileFormat(stream, FileName, settings);
-                        }
-                    }
-                }
-            } //It's possible some types fail to compress if identify was incorrect so we should skip any errors
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
+                var decompressedSettings = TryDecompressFile(stream, FileName);
+                if (decompressedSettings.CompressionFormat != null)
+                    return OpenFileFormat(decompressedSettings.Stream, FileName, decompressedSettings);
             }
 
             var info = new File_Info();
@@ -114,7 +125,9 @@ namespace Toolbox.Core.IO
                 }
             }
 
-            stream.Close();
+            //Dispose stream if file format nor compression formats can load
+            if (settings.CompressionFormat == null)
+                stream.Close();
 
             return null;
         }
