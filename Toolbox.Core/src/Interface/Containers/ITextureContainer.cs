@@ -11,5 +11,6 @@ namespace Toolbox.Core
     public interface ITextureContainer
     {
         IEnumerable<STGenericTexture> TextureList { get; }
+        bool DisplayIcons { get; }
     }
 }

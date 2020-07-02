@@ -7,6 +7,6 @@ namespace Toolbox.Core
     public interface IImportableModel
     {
         bool IdentfiyImport(string extension);
-        STGenericModel Import(string filePath);
+        STGenericScene Import(string filePath);
     }
 }

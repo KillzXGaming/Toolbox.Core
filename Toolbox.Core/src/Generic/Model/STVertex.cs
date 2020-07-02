@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using OpenTK;
 
 namespace Toolbox.Core
@@ -35,6 +35,13 @@ namespace Toolbox.Core
             float deltaZ = vertex.Position.Z - Position.Z;
 
             return (float)Math.Sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+        }
+
+        public void SortBoneIndices()
+        {
+            BoneIndices.Sort();
+            if (BoneWeights.Count == BoneIndices.Count)
+                BoneWeights.OrderBy(x => BoneIndices[BoneWeights.IndexOf(x)]);
         }
     }
 

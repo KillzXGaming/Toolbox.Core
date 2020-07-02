@@ -118,7 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="boneWeightGradient" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\boneWeightGradient.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="boneWeightGradient2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\boneWeightGradient2.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="DefaultTexture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DefaultTexture.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="UVPattern" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\UVPattern.png;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

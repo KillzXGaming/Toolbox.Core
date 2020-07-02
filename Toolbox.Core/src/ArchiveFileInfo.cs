@@ -8,6 +8,8 @@ namespace Toolbox.Core
 {
     public class ArchiveFileInfo
     {
+        public IArchiveFile ParentArchiveFile { get; set; }
+
         public string FileName { get; set; } = string.Empty;
 
         /// <summary>
@@ -18,7 +20,7 @@ namespace Toolbox.Core
         /// <summary>
         /// Determines wether to open the file format automatically
         /// </summary>
-        public bool OpenFileFormatOnLoad { get; set; }
+        public bool OpenFileFormatOnLoad { get; set; } = false;
 
         protected Stream _stream;
 
@@ -34,7 +36,10 @@ namespace Toolbox.Core
                     _stream.Position = 0;
                 return _stream;
             }
-            set {  _stream = value; }
+            set {
+                if (dataBytes != null)
+                    dataBytes = value.ToArray();
+                _stream = value; }
         }
 
         public void SetData(Stream data)
@@ -60,7 +65,11 @@ namespace Toolbox.Core
         public virtual IFileFormat OpenFile()
         {
             var data = FileData;
-            var file = STFileLoader.OpenFileFormat(DecompressData(data), FileName);
+            var file = STFileLoader.OpenFileFormat(DecompressData(data), FileName,
+                new STFileLoader.Settings()
+            {
+                ParentArchive = ParentArchiveFile,
+            });
             return file;
         }
 

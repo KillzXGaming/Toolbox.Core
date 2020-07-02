@@ -14,6 +14,12 @@ namespace Toolbox.Core.Imaging
 
         public bool IsOuputRGBA8 => false;
 
+        public DefaultSwizzle() { }
+
+        public DefaultSwizzle(TexFormat format) {
+            OutputFormat = format;
+        }
+
         public byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
             return data;
         }

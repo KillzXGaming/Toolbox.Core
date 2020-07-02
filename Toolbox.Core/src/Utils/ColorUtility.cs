@@ -31,5 +31,29 @@ namespace Toolbox.Core
                                color.B / 255.0f,
                                color.A / 255.0f);
         }
+
+        public static string ColorToHex(Color color)
+        {
+            return color.R.ToString("X2") +
+                   color.G.ToString("X2") +
+                   color.B.ToString("X2") +
+                   color.A.ToString("X2");
+        }
+
+        public static Color HexToColor(string HexText)
+        {
+            try
+            {
+                return Color.FromArgb(
+                int.Parse(HexText.Substring(6, 2), System.Globalization.NumberStyles.HexNumber),
+                int.Parse(HexText.Substring(0, 2), System.Globalization.NumberStyles.HexNumber),
+                int.Parse(HexText.Substring(2, 2), System.Globalization.NumberStyles.HexNumber),
+                int.Parse(HexText.Substring(4, 2), System.Globalization.NumberStyles.HexNumber));
+            }
+            catch
+            {
+                throw new Exception("Invalid Hex Format!");
+            }
+        }
     }
 }

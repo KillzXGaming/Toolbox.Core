@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 
 namespace Toolbox.Core.Animations
 {
@@ -38,6 +39,17 @@ namespace Toolbox.Core.Animations
         public override string ToString()
         {
             return Name;
+        }
+
+        public Quaternion InterpolateLinearRotation(float frame, float frame1, float frame2, 
+            Quaternion q1, Quaternion q2)
+        {
+            if (frame1 == frame)
+                return q1;
+            else if (frame2 == frame)
+                return q2;
+            else
+                return Quaternion.Slerp(q1, q2, (frame - frame1) / (frame2 - frame1));
         }
     }
 }

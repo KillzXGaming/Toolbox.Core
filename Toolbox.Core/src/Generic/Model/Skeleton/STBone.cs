@@ -101,6 +101,11 @@ namespace Toolbox.Core
             }
         }
 
+        public int Index
+        {
+            get { return Skeleton.Bones.IndexOf(this); }
+        }
+
         /// <summary>
         /// The animation controller storing transformation data for 
         /// displayed animations.

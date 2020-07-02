@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using Toolbox.Core.Imaging;
+using Toolbox.Core.Switch;
 
 namespace Toolbox.Core
 {
@@ -284,6 +285,8 @@ namespace Toolbox.Core
 
             if (Platform.OutputFormat != TexFormat.RGBA8_UNORM)
                 data = DecodeBlock(data, width, height, Platform.OutputFormat);
+            else if (Platform is DefaultSwizzle || Platform is TegraX1Swizzle || Platform is WiiUSwizzle)
+                data = ImageUtility.ConvertBgraToRgba(data);
 
             return BitmapExtension.CreateBitmap(data, (int)width, (int)height);
         }
@@ -324,6 +327,12 @@ namespace Toolbox.Core
         {
             var format = Platform.OutputFormat;
             return TextureFormatHelper.GetBlockDepth(format);
+        }
+
+        public uint GetBytesPerPixel()
+        {
+            var format = Platform.OutputFormat;
+            return TextureFormatHelper.GetBytesPerPixel(format);
         }
 
         public bool IsBCNCompressed()

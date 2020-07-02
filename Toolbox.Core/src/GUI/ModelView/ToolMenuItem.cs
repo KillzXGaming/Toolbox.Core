@@ -10,6 +10,8 @@ namespace Toolbox.Core.ModelView
 
         public bool Enabled { get; set; } = true;
 
+        public object Tag { get; set; }
+
         public EventHandler Click;
 
         public List<ToolMenuItem> Children = new List<ToolMenuItem>();
@@ -24,7 +26,7 @@ namespace Toolbox.Core.ModelView
 
     public class ToolMenuItemSeparator : ToolMenuItem
     {
-        public ToolMenuItemSeparator() : base("-----")
+        public ToolMenuItemSeparator() : base("")
         {
         }
     }

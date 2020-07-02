@@ -137,8 +137,8 @@ namespace Toolbox.Core.Animations
                             return InterpolationHelper.HermiteInterpolate(frame,
                              hermiteKeyLK.Frame,
                              hermiteKeyRK.Frame,
-                             hermiteKeyRK.TangentIn * length,
-                             hermiteKeyLK.TangentOut * length,
+                             hermiteKeyRK.TangentIn,
+                             hermiteKeyLK.TangentOut,
                              hermiteKeyLK.Value,
                              hermiteKeyRK.Value);
                         }

@@ -29,6 +29,20 @@ namespace Toolbox.Core.Imaging
             return OutputFormat.ToString();
         }
 
+        public WiiUSwizzle(GX2.GX2SurfaceFormat format)
+        {
+            Format = format;
+            OutputFormat = FormatList[format];
+
+            AAMode = GX2.GX2AAMode.GX2_AA_MODE_1X;
+            TileMode = GX2.GX2TileMode.MODE_2D_TILED_THIN1;
+            ResourceFlags = GX2.GX2RResourceFlags.GX2R_BIND_TEXTURE;
+            SurfaceDimension = GX2.GX2SurfaceDimension.DIM_2D;
+            SurfaceUse = GX2.GX2SurfaceUse.USE_COLOR_BUFFER;
+            Alignment = 0;
+            Pitch = 0;
+        }
+
         public WiiUSwizzle(TexFormat format)
         {
             Format = FormatList.FirstOrDefault(x => x.Value == format).Key;
@@ -51,7 +65,7 @@ namespace Toolbox.Core.Imaging
             surf.bpp = bpp;
             surf.height = texture.Height;
             surf.width = texture.Width;
-            surf.depth = 1;
+            surf.depth = texture.ArrayCount;
             surf.alignment = Alignment;
             surf.aa = (uint)AAMode;
             surf.dim = (uint)SurfaceDimension;
@@ -66,16 +80,32 @@ namespace Toolbox.Core.Imaging
             surf.tileMode = (uint)TileMode;
             surf.swizzle = Swizzle;
 
+            Console.WriteLine("WII U DECODE");
+
             return GX2.Decode(surf, array, mip);
         }
 
         public byte[] EncodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
-            return null;
+            //Swizzle and create surface
+            var NewSurface = GX2.CreateGx2Texture(data, "",
+                (uint)TileMode,
+                (uint)AAMode,
+                (uint)width,
+                (uint)height,
+                (uint)1,
+                (uint)Format,
+                (uint)0,
+                (uint)SurfaceDimension,
+                (uint)texture.MipCount
+                );
+
+            MipData = NewSurface.mipData;
+            return NewSurface.data;
         }
 
         static Dictionary<GX2.GX2SurfaceFormat, TexFormat> FormatList = new Dictionary<GX2.GX2SurfaceFormat, TexFormat>()
         {
-            { GX2.GX2SurfaceFormat.TC_R8_UNORM, TexFormat.RGBA8_UNORM },
+            { GX2.GX2SurfaceFormat.TC_R8_UNORM, TexFormat.R8_UNORM },
             { GX2.GX2SurfaceFormat.TC_R8_G8_UNORM, TexFormat.RG8_UNORM },
             { GX2.GX2SurfaceFormat.TCS_R8_G8_B8_A8_UNORM, TexFormat.RGBA8_UNORM  },
             { GX2.GX2SurfaceFormat.TCS_R8_G8_B8_A8_SRGB, TexFormat.RGBA8_SRGB  },

@@ -54,7 +54,6 @@ namespace Toolbox.Core
                     dllFileNames.AddRange(Directory.GetFiles($"{dir}", "*.dll"));
 
                 dllFileNames.AddRange(Directory.GetFiles(path, "*.dll"));
-
             }
             if (dllFileNames == null) {
                 return PluginList;

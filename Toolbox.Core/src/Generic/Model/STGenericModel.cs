@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Toolbox.Core.ModelView;
 
 namespace Toolbox.Core
 {
@@ -41,6 +42,61 @@ namespace Toolbox.Core
 
         public STGenericModel(string name) {
             Name = name;
+        }
+
+        public List<STGenericMaterial> GetMaterials()
+        {
+            List<STGenericMaterial> materials = new List<STGenericMaterial>();
+            foreach (var mesh in Meshes)
+            {
+                foreach (var group in mesh.PolygonGroups)
+                {
+                    if (group.Material != null)
+                        materials.Add(group.Material);
+                }
+            }
+            return materials;
+        }
+
+        public ObjectTreeNode CreateTreeHiearchy()
+        {
+            ObjectTreeNode root = new ObjectTreeNode(Name) { Tag = this };
+            ObjectTreeNode meshFolder = new ObjectTreeNode("Meshes");
+            ObjectTreeNode textureFolder = new ObjectTreeNode("Textures");
+            ObjectTreeNode skeletonFolder = new ObjectTreeNode("Skeleton");
+
+            root.ImageKey = "Model";
+
+            foreach (var mesh in Meshes)
+                meshFolder.AddChild(LoadMesh(mesh));
+
+            foreach (var tex in Textures)
+                textureFolder.AddChild(LoadTextureFormat(tex));
+
+            if (Skeleton != null)
+                skeletonFolder.Children.AddRange(Skeleton.CreateBoneTree());
+
+            if (meshFolder.ChildCount > 0) root.AddChild(meshFolder);
+            if (textureFolder.ChildCount > 0) root.AddChild(textureFolder);
+            if (skeletonFolder.ChildCount > 0) root.AddChild(skeletonFolder);
+
+            return root;
+        }
+
+        private ObjectTreeNode LoadMesh(STGenericMesh mesh)
+        {
+            ObjectTreeNode node = new ObjectTreeNode(mesh.Name);
+            node.ImageKey = "Mesh";
+            node.Tag = mesh;
+            return node;
+        }
+
+        private ObjectTreeNode LoadTextureFormat(STGenericTexture texture)
+        {
+            ObjectTreeNode node = new ObjectTreeNode(texture.Name);
+            node.ImageKey = "Texture";
+            node.Tag = texture;
+            return node;
         }
     }
 }

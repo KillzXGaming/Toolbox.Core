@@ -25,8 +25,6 @@ namespace Toolbox.Core.OpenGL
 
         private static Matrix4 prismRotation = Matrix4.CreateFromAxisAngle(new Vector3(0, 0, 1), 1.5708f);
 
-        public virtual float BonePointScale { get; set; } = 1.0f;
-
         public SkeletonRenderer(STGenericModel model)
         {
             Model = model;
@@ -95,6 +93,7 @@ namespace Toolbox.Core.OpenGL
 
             ShaderProgram.Enable();
             GL.Disable(EnableCap.CullFace);
+            GL.Disable(EnableCap.DepthTest);
 
             ShaderProgram.EnableVertexAttributes();
             ShaderProgram.SetMatrix4x4("rotation", ref prismRotation);
@@ -115,7 +114,7 @@ namespace Toolbox.Core.OpenGL
                 Matrix4 modelMatrix = Matrix4.Identity;
 
                 ShaderProgram.SetVector4("boneColor", ColorUtility.ToVector4(boneColor));
-                ShaderProgram.SetFloat("scale", Runtime.BonePointSize * BonePointScale);
+                ShaderProgram.SetFloat("scale", Runtime.BonePointSize * Skeleton.PreviewScale);
                 ShaderProgram.SetMatrix4x4("ModelMatrix", ref modelMatrix);
 
 

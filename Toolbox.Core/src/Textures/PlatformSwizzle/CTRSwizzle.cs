@@ -25,7 +25,7 @@ namespace Toolbox.Core.Imaging
                 Orientation = SwizzleMode,
             };
 
-            return CTR_3DS.DecodeBlock(data, (int)width, (int)height, Format, settings);
+            return ImageUtility.ConvertBgraToRgba(CTR_3DS.DecodeBlock(data, (int)width, (int)height, Format, settings));
         }
 
         public byte[] EncodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {

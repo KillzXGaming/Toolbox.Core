@@ -9,6 +9,9 @@ namespace Toolbox.Core
 {
     public static class STMath
     {
+        public static float Deg2Rad = (float)(System.Math.PI * 2) / 360;
+        public static float Rad2Deg = (float)(360 / (System.Math.PI * 2));
+
         private const long SizeOfKb = 1024;
         private const long SizeOfMb = SizeOfKb * 1024;
         private const long SizeOfGb = SizeOfMb * 1024;

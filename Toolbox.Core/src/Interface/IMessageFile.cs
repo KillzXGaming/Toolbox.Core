@@ -4,7 +4,8 @@ using System.Text;
 
 namespace Toolbox.Core
 {
-    public interface IFontFormat
+    interface IMessageFile
     {
+
     }
 }

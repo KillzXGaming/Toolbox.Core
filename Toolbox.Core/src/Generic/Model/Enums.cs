@@ -19,6 +19,19 @@ namespace Toolbox.Core
         LineLoop,
     }
 
+    public enum STPolygonGroupType
+    {
+        /// <summary>
+        /// Displays all the polygon groups.
+        /// </summary>
+        Default,
+        /// <summary>
+        /// Handles a polygon group as a level of detail.
+        /// Only one polygon group will display at a time (given all are using this type).
+        /// </summary>
+        LevelOfDetail,
+    }
+
     /// <summary>
     /// The type of texture to display in a texture map.
     /// </summary>

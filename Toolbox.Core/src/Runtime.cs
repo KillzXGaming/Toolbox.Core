@@ -32,6 +32,22 @@ namespace Toolbox.Core
         /// </summary>
         public static bool RenderModels = true;
 
+        /// <summary>
+        /// Toggles debug shader rendering in 3D view.
+        /// </summary>
+        public static DebugRender DebugRendering = DebugRender.Default;
+
+        public enum DebugRender
+        {
+            Default,
+            Normal,
+            Lighting,
+            Diffuse,
+            VertexColors,
+            UVCoords,
+            UVTestPattern,
+        }
+
         private static string executableDir;
 
         /// <summary>
@@ -107,6 +123,11 @@ namespace Toolbox.Core
             public static float CellSize = 1.0f;
             public static uint CellAmount = 10;
             public static Color color = Color.FromArgb(90, 90, 90);
+        }
+
+        public class UVEditor
+        {
+            public static Color UVColor = Color.FromArgb(255, 128, 0);
         }
 
         public class ObjectEditor

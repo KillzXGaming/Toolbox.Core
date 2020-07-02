@@ -63,9 +63,39 @@ namespace Toolbox.Core.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        public static byte[] boneWeightGradient {
+            get {
+                object obj = ResourceManager.GetObject("boneWeightGradient", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] boneWeightGradient2 {
+            get {
+                object obj = ResourceManager.GetObject("boneWeightGradient2", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         public static byte[] DefaultTexture {
             get {
                 object obj = ResourceManager.GetObject("DefaultTexture", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] UVPattern {
+            get {
+                object obj = ResourceManager.GetObject("UVPattern", resourceCulture);
                 return ((byte[])(obj));
             }
         }

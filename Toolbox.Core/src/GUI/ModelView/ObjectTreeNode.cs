@@ -7,9 +7,12 @@ namespace Toolbox.Core.ModelView
     public class ObjectTreeNode
     {
         public int ChildCount { get { return Children.Count; } }
+
         public List<ObjectTreeNode> Children { get; set; }
+
         public virtual string Label { get; set; }
         public virtual string ImageKey { get; set; }
+        public virtual bool Checked { get; set; } = true;
 
         public ObjectTreeNode Parent { get; set; }
 

@@ -246,8 +246,29 @@ namespace Toolbox.Core.GUI
         {
             public virtual string Text { get; set; }
 
-            public virtual bool Enabled { get; set; } = true;
-            public virtual bool Visible { get; set; } = true;
+            private bool enabled = true;
+            public bool Enabled
+            {
+                get { return enabled; }
+                set
+                {
+                    if (enabled == value) return;
+                    enabled = value;
+                    OnPropertyChanged("Enabled");
+                }
+            }
+
+            private bool visible = true;
+            public bool Visible
+            {
+                get { return visible; }
+                set
+                {
+                    if (visible == value) return;
+                    visible = value;
+                    OnPropertyChanged("Visible");
+                }
+            }
 
             public event PropertyChangedEventHandler PropertyChanged;
 
@@ -255,6 +276,11 @@ namespace Toolbox.Core.GUI
             {
                 PropertyChangedEventHandler handler = PropertyChanged;
                 if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+
+            public virtual void UpdateGUI()
+            {
+
             }
         }
     }

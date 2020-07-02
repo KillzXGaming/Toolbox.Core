@@ -38,6 +38,11 @@ namespace Toolbox.Core
         public int FaceOffset { get; set; }
 
         /// <summary>
+        /// Determines the type of group being drawn.
+        /// </summary>
+        public STPolygonGroupType GroupType { get; set; } = STPolygonGroupType.Default;
+
+        /// <summary>
         /// Gets or sets the primitive type to be displayed for faces.
         /// </summary>
         public STPrimitiveType PrimitiveType { get; set; } = STPrimitiveType.Triangles;

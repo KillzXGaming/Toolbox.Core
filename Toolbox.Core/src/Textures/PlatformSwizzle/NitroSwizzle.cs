@@ -10,6 +10,8 @@ namespace Toolbox.Core.Imaging
 
         public bool isColor0 = true;
 
+        public byte[] PaletteData { get; set; }
+
         public Nitro.NitroTex.NitroTexFormat Format;
 
         public override string ToString() {
@@ -21,7 +23,7 @@ namespace Toolbox.Core.Imaging
         }
 
         public byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
-            return Nitro.NitroTex.DecodeTexture((int)width, (int)height, Format, data, texture.GetPaletteData(), isColor0);
+            return Nitro.NitroTex.DecodeTexture((int)width, (int)height, Format, data, PaletteData, isColor0);
         }
 
         public byte[] EncodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {

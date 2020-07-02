@@ -52,7 +52,22 @@ namespace Toolbox.Core
         /// </summary>
         public uint VertexSkinCount { get; set; }
 
+        /// <summary>
+        /// The transformation of the model when moved in the 3D view.
+        /// </summary>
         public ModelTransform Transform { get; set; } = new ModelTransform();
+
+        public EventHandler MeshSelected;
+        public EventHandler MeshDeselected;
+        public EventHandler SelectMesh;
+
+        public virtual void AferSelect() {
+            MeshSelected?.Invoke(this, EventArgs.Empty);
+        }
+
+        public virtual void AferDeselect() {
+            MeshDeselected?.Invoke(this, EventArgs.Empty);
+        }
 
         #region methods
 
@@ -90,6 +105,87 @@ namespace Toolbox.Core
 
             Vertices.Clear();
             Vertices.AddRange(verticesNew.Keys);
+        }
+
+        /// <summary>
+        /// Flips the texture coordinates vertically.
+        /// </summary>
+        public void FlipUvsVertical()
+        {
+            for (int i = 0; i < Vertices.Count; i++) {
+                for (int u = 0; u < Vertices[i].TexCoords.Length; u++) {
+                    Vertices[i].TexCoords[u] = new Vector2(
+                        Vertices[i].TexCoords[u].X,
+                    1 - Vertices[i].TexCoords[u].Y);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Flips the texture coordinates horizontally.
+        /// </summary>
+        public void FlipUvsHorizontal()
+        {
+            for (int i = 0; i < Vertices.Count; i++)
+            {
+                for (int u = 0; u < Vertices[i].TexCoords.Length; u++)
+                {
+                    Vertices[i].TexCoords[u] = new Vector2(
+                       1 - Vertices[i].TexCoords[u].X,
+                           Vertices[i].TexCoords[u].Y);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the vertex color for all vertices of the current mesh given the color channel.
+        /// </summary>
+        /// <param name="intColor"></param>
+        public void SetVertexColor(Vector4 intColor, int channel = 0)
+        {
+            foreach (STVertex v in Vertices)
+            {
+                if (v.Colors.Length > channel)
+                    v.Colors[channel] = intColor;
+            }
+        }
+
+        /// <summary>
+        /// Recalculates the normals based on vertex positions.
+        /// </summary>
+        public void CalculateNormals()
+        {
+            if (Vertices.Count < 3)
+                return;
+
+            Vector3[] normals = new Vector3[Vertices.Count];
+            for (int i = 0; i < normals.Length; i++)
+                normals[i] = new Vector3(0, 0, 0);
+
+            List<uint> f = Faces;
+            for (int i = 0; i < f.Count; i += 3)
+            {
+                STVertex v1 = Vertices[(int)f[i]];
+                STVertex v2 = Vertices[(int)f[i + 1]];
+                STVertex v3 = Vertices[(int)f[i + 2]];
+                Vector3 nrm = CalculateNormal(v1, v2, v3);
+
+                normals[f[i + 0]] += nrm * (nrm.Length / 2);
+                normals[f[i + 1]] += nrm * (nrm.Length / 2);
+                normals[f[i + 2]] += nrm * (nrm.Length / 2);
+            }
+
+            for (int i = 0; i < normals.Length; i++)
+                Vertices[i].Normal = normals[i].Normalized();
+        }
+
+        private Vector3 CalculateNormal(STVertex v1, STVertex v2, STVertex v3)
+        {
+            Vector3 U = v2.Position - v1.Position;
+            Vector3 V = v3.Position - v1.Position;
+
+            // Don't normalize here, so surface area can be calculated. 
+            return Vector3.Cross(U, V);
         }
 
         /// <summary>

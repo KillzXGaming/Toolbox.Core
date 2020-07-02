@@ -43,6 +43,18 @@ namespace Toolbox.Core
         /// <returns></returns>
         public virtual STGenericTexture GetTexture()
         {
+            foreach (var container in Runtime.ModelContainers)
+            {
+                foreach (var model in container.ModelList)
+                {
+                    foreach (var tex in model.ToGeneric().Textures)
+                    {
+                        if (tex.Name == Name)
+                            return tex;
+                    }
+                }
+            }
+
             return null;
         }
     }

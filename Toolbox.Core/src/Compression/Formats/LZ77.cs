@@ -13,7 +13,6 @@ namespace Toolbox.Core
         public string[] Description { get; set; } = new string[] { "LZ77 Compressed" };
         public string[] Extension { get; set; } = new string[] { "*.lz", };
 
-        bool isType11;
         public bool Identify(Stream stream, string fileName)
         {
             if (stream.Length < 16)
@@ -24,8 +23,7 @@ namespace Toolbox.Core
                 if (Utils.GetExtension(fileName) == ".lz")
                 {
                     reader.SeekBegin(12);
-                    isType11 = reader.ReadByte() == 0x11;
-                    return isType11;
+                    return reader.ReadByte() == 0x11;
                 }
             }
             return false;
@@ -37,7 +35,8 @@ namespace Toolbox.Core
         {
             using (var reader = new FileReader(stream, true))
             {
-                if (isType11)
+                byte type = reader.ReadByte();
+                if (type == 0x11)
                 {
                     uint decomp_size = reader.ReadUInt32();
 

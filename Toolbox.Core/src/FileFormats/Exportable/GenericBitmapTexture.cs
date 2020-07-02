@@ -8,8 +8,17 @@ using Toolbox.Core.Imaging;
 
 namespace Toolbox.Core
 {
-    public class GenericBitmapTexture : STGenericTexture, IFileFormat, IExportableTexture
+    public class GenericBitmapTexture : STGenericTexture, IFileFormat, IImportableTexture, IExportableTexture
     {
+        public bool IdentifyImport(string ext)
+        {
+            return
+                ext == ".png" ||
+                ext == "jpg" ||
+                ext == ".gif" ||
+                ext == ".tiff";
+        }
+
         public bool IdentifyExport(string ext) {
             return
                 ext == ".png" ||
@@ -41,14 +50,14 @@ namespace Toolbox.Core
             ImageData = FileData;
         }
 
-        public void Load(System.IO.Stream stream) {
-            LoadBitmap(new Bitmap(stream), false);
-        }
-
         public GenericBitmapTexture() { }
 
         public GenericBitmapTexture(Bitmap Image) {
             LoadBitmap(Image);
+        }
+
+        public GenericBitmapTexture(System.IO.Stream stream) {
+            LoadBitmap(new Bitmap(stream), false);
         }
 
         public GenericBitmapTexture(byte[] imageData)
@@ -59,6 +68,10 @@ namespace Toolbox.Core
                 bmp = new Bitmap(ms);
                 LoadBitmap(bmp);
             }
+        }
+
+        public void Load(System.IO.Stream stream) {
+            LoadBitmap(new Bitmap(stream), false);
         }
 
         private void LoadBitmap(Bitmap bitmap, bool swapBlueRed = true)
@@ -96,6 +109,10 @@ namespace Toolbox.Core
 
             var bitmap = BitmapExtension.CreateBitmap(ImageData, (int)Width, (int)Height);
             bitmap.Save(stream, format);
+        }
+
+        public STGenericTexture Import(string fileName) {
+            return new GenericBitmapTexture(System.IO.File.OpenRead(fileName));
         }
 
         public void Export(STGenericTexture texture, TextureExportSettings settings, string filePath)

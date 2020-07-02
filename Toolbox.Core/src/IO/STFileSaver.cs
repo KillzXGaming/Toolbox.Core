@@ -25,7 +25,6 @@ namespace Toolbox.Core.IO
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
-
             if (fileFormat.FileInfo.KeepOpen && File.Exists(fileName))
             {
                 string savedPath = Path.GetDirectoryName(fileName);
@@ -37,7 +36,7 @@ namespace Toolbox.Core.IO
                     fileFormat.Save(fileStream);
                     if (fileFormat.FileInfo.Compression != null)
                     {
-                        Stream comp = CompressFile(File.OpenRead(tempPath), fileFormat);
+                       // Stream comp = CompressFile(File.OpenRead(tempPath), fileFormat);
                         //fileStream.CopyTo(comp);
                     }
 
@@ -55,10 +54,15 @@ namespace Toolbox.Core.IO
             }
             else if (fileFormat.FileInfo.Compression != null)
             {
-                Stream mem = new MemoryStream();
+                MemoryStream mem = new MemoryStream();
                 fileFormat.Save(mem);
-                mem = CompressFile(mem, fileFormat);
-                File.WriteAllBytes(fileName, mem.ToArray());
+                mem = new MemoryStream(mem.ToArray());
+                var finalStream = CompressFile(mem, fileFormat);
+               // File.WriteAllBytes(fileName, finalStream.ToArray());
+
+                using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite)) {
+                    finalStream.CopyTo(fileStream);
+                }
             }
             else
             {
@@ -82,19 +86,28 @@ namespace Toolbox.Core.IO
         /// <returns></returns>
         public static Stream SaveFileFormat(IFileFormat fileFormat)
         {
-         //   SaveLog log = new SaveLog();
+            //   SaveLog log = new SaveLog();
 
-            Stream mem = new MemoryStream();
+            MemoryStream mem = new MemoryStream();
             fileFormat.Save(mem);
 
             if (fileFormat.FileInfo.Compression != null) {
-                mem = CompressFile(mem, fileFormat);
+               return CompressFile(mem, fileFormat);
             }
 
             return mem;
         }
 
-        static Stream CompressFile(Stream mem, IFileFormat fileFormat)
+        static Stream CompressFile(FileStream mem, IFileFormat fileFormat)
+        {
+            var compressionFormat = fileFormat.FileInfo.Compression;
+            var compressedStream = compressionFormat.Compress(mem);
+            //Update the compression size
+            fileFormat.FileInfo.CompressedSize = (uint)compressedStream.Length;
+            return compressedStream;
+        }
+
+        static Stream CompressFile(MemoryStream mem, IFileFormat fileFormat)
         {
             var compressionFormat = fileFormat.FileInfo.Compression;
             var compressedStream = compressionFormat.Compress(mem);

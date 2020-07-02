@@ -33,5 +33,7 @@ namespace Toolbox.Core
             get { return STMath.ToEulerAngles(Rotation); }
             set { Rotation = STMath.FromEulerAngles(value); }
         }
+
+        public bool WorldTransform { get; set; } = false;
     }
 }

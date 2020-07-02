@@ -673,13 +673,16 @@ namespace Toolbox.Core.WiiU
                 mipdata = new byte[tex.mipData.Length];
 
             uint mipCount = tex.numMips;
+            uint depthCount = 1;
             if (tex.mipData == null || tex.mipData.Length <= 0)
                 mipCount = 1;
+            if (tex.depth > 1)
+                depthCount = tex.depth;
 
             int dataOffset = 0;
             int mipDataOffset = 0;
 
-            for (int arrayLevel = 0; arrayLevel < tex.depth; arrayLevel++)
+            for (int arrayLevel = 0; arrayLevel < depthCount; arrayLevel++)
             {
                 int mipSpliceSize = 0;
 

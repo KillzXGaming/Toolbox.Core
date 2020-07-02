@@ -18,6 +18,11 @@ namespace Toolbox.Core.IO
             public bool KeepOpen = false;
 
             /// <summary>
+            /// The parent archive format set.
+            /// </summary>
+            public IArchiveFile ParentArchive = null;
+
+            /// <summary>
             /// The compression format set.
             /// </summary>
             public ICompressionFormat CompressionFormat = null;
@@ -102,25 +107,28 @@ namespace Toolbox.Core.IO
             if (settings.CompressionFormat == null)
             {
                 var decompressedSettings = TryDecompressFile(stream, FileName);
-                if (decompressedSettings.CompressionFormat != null)
+                if (decompressedSettings.CompressionFormat != null) {
+                    stream.Dispose();
+                    stream.Close();
                     return OpenFileFormat(decompressedSettings.Stream, FileName, decompressedSettings);
+                }
             }
 
             var info = new File_Info();
             info.FileName = Path.GetFileName(FileName);
             info.FilePath = FileName;
+            info.ParentArchive = settings.ParentArchive;
 
             stream.Position = streamStartPos;
             foreach (IFileFormat fileFormat in FileManager.GetFileFormats())
             {
-                Console.WriteLine($"fileFormat {fileFormat}!");
-
                 //Set the file name so we can check it's extension in the identifier. 
                 //Most is by magic but some can be extension or name.
 
                 if (fileFormat.Identify(info, stream) && !IsFileFiltered(fileFormat, settings))
                 {
                     fileFormat.FileInfo = info;
+                    fileFormat.FileInfo.Stream = stream;
                     return SetFileFormat(fileFormat, FileName, stream, settings);
                 }
             }
@@ -157,11 +165,20 @@ namespace Toolbox.Core.IO
             fileFormat.FileInfo.CompressedSize = (uint)settings.CompressedSize;
             fileFormat.FileInfo.Compression = settings.CompressionFormat;
             fileFormat.Load(stream);
-            //After file has been loaded and read, we'll dispose unless left open
 
+            //Apply necessary file info for archive files
+            if (fileFormat is IArchiveFile) {
+                foreach (var file in ((IArchiveFile)fileFormat).Files)
+                    file.ParentArchiveFile = (IArchiveFile)fileFormat;
+            }
+
+            //After file has been loaded and read, we'll dispose unless left ope
             if (!settings.KeepOpen && !fileFormat.FileInfo.KeepOpen)
             {
                 stream.Dispose();
+                stream.Close();
+                settings.Stream?.Dispose();
+                settings.Stream?.Close();
                 GC.SuppressFinalize(stream);
             }
 

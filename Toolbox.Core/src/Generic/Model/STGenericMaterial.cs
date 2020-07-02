@@ -19,5 +19,24 @@ namespace Toolbox.Core
         /// A list of texture maps to display textures on the material.
         /// </summary>
         public List<STGenericTextureMap> TextureMaps = new List<STGenericTextureMap>();
+
+        /// <summary>
+        /// The color of the diffuse lighting on this material.
+        /// </summary>
+        public STColor8 DiffuseColor { get; set; } = STColor8.White;
+
+        public STGenericModel ParentModel;
+
+        public List<STGenericMesh> GetMappedMeshes()
+        {
+            List<STGenericMesh> meshes = new List<STGenericMesh>();
+        /*    for (int i = 0; i < ParentModel.Meshes.Count; i++) {
+                foreach (var group in ParentModel.Meshes[i].PolygonGroups) {
+                    if (group.Material == this)
+                        meshes.Add(ParentModel.Meshes[i]);
+                }
+            }*/
+            return meshes;
+        }
     }
 }

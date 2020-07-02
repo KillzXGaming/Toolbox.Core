@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Toolbox.Core
@@ -55,6 +56,9 @@ namespace Toolbox.Core
         public string FolderPath {
             get { return System.IO.Path.GetDirectoryName(GetSourcePath(this)); }
         }
+
+        //The stream of the file. Used for disposing when the file is closed
+        public Stream Stream { get; set; }
 
         static string GetSourcePath(File_Info fileInfo)
         {

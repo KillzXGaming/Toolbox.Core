@@ -125,12 +125,6 @@ namespace Toolbox.Core
             width = (int)GenericTexture.Width;
             height = (int)GenericTexture.Height;
 
-            /*  if (Runtime.DisableLoadingGLHighResTextures)
-              {
-                  if (width >= 3000 || height >= 3000)
-                      return;
-              }*/
-
             switch (GenericTexture.SurfaceType)
             {
                 case STSurfaceType.Texture1D:
@@ -152,9 +146,11 @@ namespace Toolbox.Core
                     TextureTarget = TextureTarget.Texture3D;
                     break;
                 case STSurfaceType.TextureCube:
+                    IsCubeMap = true;
                     TextureTarget = TextureTarget.TextureCubeMap;
                     break;
                 case STSurfaceType.TextureCube_Array:
+                    IsCubeMap = true;
                     TextureTarget = TextureTarget.TextureCubeMapArray;
                     break;
             }
@@ -207,12 +203,12 @@ namespace Toolbox.Core
                 pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Rgba;
 
                 if (GenericTexture.Platform is Imaging.CTRSwizzle ||
-                    GenericTexture.Platform is Imaging.GamecubeSwizzle)
+                    GenericTexture.Platform is Imaging.GamecubeSwizzle ||
+                    GenericTexture.Platform is Imaging.NitroSwizzle)
                 {
                     UseOpenGLDecoder = false;
                     pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
                 }
-
 
                 if (UseOpenGLDecoder)
                     SetPixelFormats(GenericTexture.Platform.OutputFormat);

@@ -81,5 +81,146 @@ namespace Toolbox.Core.IO
                 output.Flush();
             }
         }
+
+
+        public class ZLIB_GZ
+        {
+            public static bool IsCompressed(Stream stream)
+            {
+                if (stream.Length < 32) return false;
+
+                using (var reader = new FileReader(stream, true))
+                {
+                    reader.Position = 0;
+                    ushort check = reader.ReadUInt16();
+                    reader.ReadUInt16();
+                    if (check != 0)
+                        reader.SetByteOrder(true);
+                    else
+                        reader.SetByteOrder(false);
+
+                    uint chunkCount = reader.ReadUInt32();
+                    uint decompressedSize = reader.ReadUInt32();
+                    if (reader.BaseStream.Length > 8 + (chunkCount * 4) + 128)
+                    {
+                        uint[] chunkSizes = reader.ReadUInt32s((int)chunkCount);
+                        reader.Align(128);
+
+                        //Now search for zlibbed chunks
+                        uint size = reader.ReadUInt32();
+                        ushort magic = reader.ReadUInt16();
+
+                        reader.Position = 0;
+                        if (magic == 0x78da || magic == 0xda78)
+                            return true;
+                        else
+                            return false;
+                    }
+
+                    reader.Position = 0;
+                }
+
+                return false;
+            }
+
+            public static Stream Decompress(Stream stream)
+            {
+                using (var reader = new FileReader(stream, true))
+                {
+                    ushort check = reader.ReadUInt16();
+                    reader.ReadUInt16();
+                    if (check != 0)
+                        reader.SetByteOrder(true);
+                    else
+                        reader.SetByteOrder(false);
+
+                    try
+                    {
+                        uint chunkCount = reader.ReadUInt32();
+                        uint decompressedSize = reader.ReadUInt32();
+                        uint[] chunkSizes = reader.ReadUInt32s((int)chunkCount); //Not very sure about this
+
+                        reader.Align(128);
+
+                        List<byte[]> DecompressedChunks = new List<byte[]>();
+
+                        Console.WriteLine($"pos {reader.Position}");
+
+                        //Now search for zlibbed chunks
+                        while (!reader.EndOfStream)
+                        {
+                            uint size = reader.ReadUInt32();
+
+                            long pos = reader.Position;
+                            ushort magic = reader.ReadUInt16();
+
+                            ///Check zlib magic
+                            if (magic == 0x78da || magic == 0xda78)
+                            {
+                                var data = STLibraryCompression.ZLIB.Decompress(reader.getSection((uint)pos, size));
+                                DecompressedChunks.Add(data);
+
+                                reader.SeekBegin(pos + size); //Seek the compressed size and align it to goto the next chunk
+                                reader.Align(128);
+                            }
+                            else //If the magic check fails, seek back 2. This shouldn't happen, but just incase
+                                reader.Seek(-2);
+                        }
+
+                        //Return the decompressed stream with all chunks combined
+                        return new MemoryStream(ByteUtils.CombineArray(DecompressedChunks.ToArray()));
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                return null;
+            }
+
+            public static Stream Compress(Stream stream, bool isBigEndian = true)
+            {
+                uint decompSize = (uint)stream.Length;
+                uint[] section_sizes;
+                uint sectionCount = 0;
+
+                var mem = new MemoryStream();
+                using (var reader = new FileReader(stream, true))
+                using (var writer = new FileWriter(mem, true))
+                {
+                    writer.SetByteOrder(isBigEndian);
+
+                    if (!(decompSize % 0x10000 != 0))
+                        sectionCount = decompSize / 0x10000;
+                    else
+                        sectionCount = (decompSize / 0x10000) + 1;
+
+                    writer.Write(0x10000);
+                    writer.Write(sectionCount);
+                    writer.Write(decompSize);
+                    writer.Write(new uint[sectionCount]);
+                    writer.Align(128);
+
+                    reader.SeekBegin(0);
+                    section_sizes = new uint[sectionCount];
+                    for (int i = 0; i < sectionCount; i++)
+                    {
+                        byte[] chunk = STLibraryCompression.ZLIB.Compress(reader.ReadBytes(0x10000));
+
+                        section_sizes[i] = (uint)chunk.Length;
+
+                        writer.Write(chunk.Length);
+                        writer.Write(chunk);
+                        writer.Align(128);
+                    }
+
+                    writer.SeekBegin(12);
+                    for (int i = 0; i < sectionCount; i++)
+                        writer.Write(section_sizes[i] + 4);
+                }
+                return mem;
+            }
+        }
     }
 }

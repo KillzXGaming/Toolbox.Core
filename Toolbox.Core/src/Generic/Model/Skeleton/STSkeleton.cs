@@ -23,6 +23,11 @@ namespace Toolbox.Core
         public bool Visible { get; set; }
 
         /// <summary>
+        /// The scaling of the bones when they are displayed.
+        /// </summary>
+        public float PreviewScale { get; set; } = 1.0f;
+
+        /// <summary>
         /// Resets the current pose back to the original state.
         /// </summary>
         public void Reset()
@@ -96,10 +101,29 @@ namespace Toolbox.Core
                 Matrix4.CreateFromQuaternion(bone.AnimationController.Rotation) *
                 Matrix4.CreateTranslation(bone.AnimationController.Position);
 
-            if (bone.ParentIndex != -1)
+            if (bone.ParentIndex != -1 && !bone.AnimationController.WorldTransform)
                 return transform * GetWorldMatrix(bone.Parent);
             else
                 return transform;
+        }
+
+        public void ConvertWorldToLocalSpace()
+        {
+            foreach (var bone in Bones)
+                ConvertWorldToLocalSpace(bone);
+
+            Reset();
+            Update();
+        }
+
+        private void ConvertWorldToLocalSpace(STBone bone)
+        {
+            if (bone.ParentIndex != -1)
+            {
+                var mat = GetBoneTransform(bone.Parent).Inverted();
+                bone.Position = Vector3.TransformPosition(bone.Position, mat);
+                bone.Rotation = mat.ExtractRotation() * bone.Rotation;
+            }
         }
 
         /// <summary>
