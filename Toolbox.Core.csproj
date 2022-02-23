@@ -31,16 +31,15 @@
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="OpenTK">
-      <HintPath>..\CafeShaderStudio\Lib\OpenTK.dll</HintPath>
+      <HintPath>lib\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.BinaryData">
-      <HintPath>..\CafeShaderStudio\Lib\Syroot.BinaryData.dll</HintPath>
+      <HintPath>lib\Syroot.BinaryData.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.Maths">
-      <HintPath>..\CafeShaderStudio\Lib\Syroot.Maths.dll</HintPath>
+      <HintPath>lib\Syroot.Maths.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
