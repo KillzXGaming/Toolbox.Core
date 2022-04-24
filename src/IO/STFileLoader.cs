@@ -124,10 +124,13 @@ namespace Toolbox.Core.IO
                 //Set the file name so we can check it's extension in the identifier. 
                 //Most is by magic but some can be extension or name.
 
+                stream.Position = streamStartPos;
                 if (fileFormat.Identify(info, stream) && !IsFileFiltered(fileFormat, settings))
                 {
                     fileFormat.FileInfo = info;
                     fileFormat.FileInfo.Stream = stream;
+
+                    stream.Position = streamStartPos;
                     return SetFileFormat(fileFormat, FileName, stream, settings);
                 }
             }

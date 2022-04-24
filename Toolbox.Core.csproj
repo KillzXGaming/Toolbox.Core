@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net46|AnyCPU'">
@@ -28,21 +28,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|x86'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="IONET">
+      <HintPath>..\Track Studio\Lib\IONET.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+    </Reference>
     <Reference Include="OpenTK">
-      <HintPath>lib\OpenTK.dll</HintPath>
+      <HintPath>..\Track Studio\Lib\OpenTK.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="Syroot.BinaryData">
-      <HintPath>lib\Syroot.BinaryData.dll</HintPath>
+      <HintPath>..\Track Studio\Lib\Syroot.BinaryData.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
     </Reference>
     <Reference Include="Syroot.Maths">
-      <HintPath>lib\Syroot.Maths.dll</HintPath>
+      <HintPath>..\Track Studio\Lib\Syroot.Maths.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
     </Reference>
   </ItemGroup>
 </Project>

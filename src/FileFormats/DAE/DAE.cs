@@ -403,40 +403,6 @@ namespace Toolbox.Core.Collada
 
                     foreach (var vertex in mesh.Vertices)
                     {
-                        //Remove zero weights
-                        if (settings.OptmizeZeroWeights)
-                        {
-                            float MaxWeight = 1;
-                            for (int i = 0; i < 4; i++)
-                            {
-                                if (vertex.BoneWeights.Count <= i)
-                                    continue;
-
-                                if (vertex.BoneIndices.Count < i + 1)
-                                {
-                                    vertex.BoneWeights[i] = 0;
-                                    MaxWeight = 0;
-                                }
-                                else
-                                {
-                                    float weight = vertex.BoneWeights[i];
-                                    if (vertex.BoneWeights.Count == i + 1)
-                                        weight = MaxWeight;
-
-                                    if (weight >= MaxWeight)
-                                    {
-                                        weight = MaxWeight;
-                                        MaxWeight = 0;
-                                    }
-                                    else
-                                        MaxWeight -= weight;
-
-                                    vertex.BoneWeights[i] = weight;
-                                }
-                            }
-                        }
-
-
                         if (vertex.Normal != Vector3.Zero) HasNormals = true;
                         if (vertex.Colors.Length > 0 && settings.UseVertexColors) HasColors = true;
                         if (vertex.Colors.Length > 1 && settings.UseVertexColors) HasColors2 = true;
@@ -496,8 +462,14 @@ namespace Toolbox.Core.Collada
                             //Some models may only use indices (single bind, rigid skin)
                             if (vertex.BoneWeights.Count > b)
                                 bWeights.Add(vertex.BoneWeights[b]);
-                            else
-                                bWeights.Add(1);
+                            else //unweighed bone
+                                bWeights.Add(0);
+                        }
+
+                        //Make sure the bone weights are normalized
+                        if (bWeights.Sum(x => x) != 1.0f)
+                        {
+
                         }
 
                         if (bIndices.Count == 0 && mesh.BoneIndex != -1)

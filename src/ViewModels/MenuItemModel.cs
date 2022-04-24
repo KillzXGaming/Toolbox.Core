@@ -22,6 +22,9 @@ namespace Toolbox.Core.ViewModels
             }
         }
 
+
+        public string Icon { get; set; }
+
         public string ToolTip { get; set; } = "";
 
         private bool _isChecked;

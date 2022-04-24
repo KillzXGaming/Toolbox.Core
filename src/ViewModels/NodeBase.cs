@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
 using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 using System.ComponentModel;
 
 namespace Toolbox.Core.ViewModels
 {
-    public class NodeBase : INotifyPropertyChanged
+    public class NodeBase : ISelectableElement, INotifyPropertyChanged
     {
         public EventHandler OnSelected;
         public EventHandler OnChecked;
+        public EventHandler OnHeaderRenamed;
+
+        public EventHandler IconDrawer;
 
         private readonly ObservableCollection<NodeBase> _children = new ObservableCollection<NodeBase>();
 
@@ -40,17 +43,19 @@ namespace Toolbox.Core.ViewModels
 
         public int DisplayIndex = -1;
 
+        public Func<string> GetHeader;
+
         private string _header;
 
         /// <summary>
         /// Gets or sets the header of the tree node.
         /// </summary>
-        public virtual string Header
+        public virtual string Header 
         {
-            get { return _header; }
+            get { return GetHeader(); }
             set
             {
-                _header = value;
+                GetHeader = () => { return value; };
                 RaisePropertyChanged("Header");
             }
         }
@@ -70,10 +75,16 @@ namespace Toolbox.Core.ViewModels
             }
         }
 
+        private object tag;
+
         /// <summary>
         /// Gets or sets the node tag, used for node properties.
         /// </summary>
-        public virtual object Tag { get; set; }
+        public virtual object Tag
+        {
+            get { return tag; }
+            set { tag = value; }
+        }
 
         private bool _isExpanded;
 
@@ -116,6 +127,8 @@ namespace Toolbox.Core.ViewModels
         /// </summary>
         public bool Visible { get; set; }
 
+        public bool ActivateRename { get; set; }
+
         private int _index;
 
         /// <summary>
@@ -146,6 +159,8 @@ namespace Toolbox.Core.ViewModels
                 ImageSource = new Uri(_icon, UriKind.Relative);
             }
         }
+
+        public virtual Vector4 IconColor { get; set; } = new Vector4(1);
 
         private object imageSoure = new Uri("\\Images\\Folder.png", UriKind.Relative);
 
@@ -263,8 +278,7 @@ namespace Toolbox.Core.ViewModels
             var sortableList = new List<T>(collection);
             sortableList.Sort(comparison);
 
-            for (int i = 0; i < sortableList.Count; i++)
-            {
+            for (int i = 0; i < sortableList.Count; i++) {
                 collection.Move(collection.IndexOf(sortableList[i]), i);
             }
         }

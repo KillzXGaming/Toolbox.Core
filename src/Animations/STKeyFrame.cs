@@ -23,10 +23,9 @@ namespace Toolbox.Core.Animations
         /// </summary>
         public virtual float Slope { get; set; }
 
-        /// <summary>
-        /// The delta of linear key value.
-        /// </summary>
-        public virtual float Delta { get; set; }
+        //UI elements
+
+        public bool IsSelected = false;
 
         public STKeyFrame() { }
 
@@ -40,6 +39,34 @@ namespace Toolbox.Core.Animations
         {
             Frame = frame;
             Value = value;
+        }
+
+        public virtual STKeyFrame Clone()
+        {
+            return new STKeyFrame(Frame, Value);
+        }
+    }
+
+    /// <summary>
+    /// Represents a linear key frame used for linear interpolation
+    /// This key frame provides the delta value to determine the weight between keys.
+    /// </summary>
+    public class STLinearKeyFrame : STKeyFrame
+    {
+        public bool StepDelta = false;
+
+        /// <summary>
+        /// The delta of linear key value.
+        /// </summary>
+        public virtual float Delta { get; set; }
+
+        public STLinearKeyFrame() { }
+
+        public STLinearKeyFrame(int frame, float value, float delta = 0)
+        {
+            Frame = frame;
+            Value = value;
+            Delta = delta;
         }
     }
 
@@ -112,5 +139,15 @@ namespace Toolbox.Core.Animations
     {
         public virtual float TangentIn { get; set; }
         public virtual float TangentOut { get; set; }
+
+        public STHermiteKeyFrame() { }
+
+        public STHermiteKeyFrame(int frame, float value, float tangentIn, float tangentOut)
+        {
+            Frame = frame;
+            Value = value;
+            TangentIn = tangentIn;
+            TangentOut = tangentOut;
+        }
     }
 }

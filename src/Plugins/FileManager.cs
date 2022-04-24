@@ -7,15 +7,6 @@ namespace Toolbox.Core
 {
     public class FileManager
     {
-        public static IFileIconLoader[] GetFileIconLoaders()
-        {
-            List<IFileIconLoader> types = new List<IFileIconLoader>();
-            foreach (var plugin in PluginManager.LoadPlugins())
-                types.AddRange(plugin.FileIconLoaders);
-
-            return types.ToArray();
-        }
-
         public static ICompressionFormat[] GetCompressionFormats()
         {
             List<ICompressionFormat> types = new List<ICompressionFormat>();
@@ -75,6 +66,16 @@ namespace Toolbox.Core
             List<ITextureDecoder> types = new List<ITextureDecoder>();
             foreach (var plugin in PluginManager.LoadPlugins())
                 types.AddRange(plugin.TextureDecoders);
+
+            return types.ToArray();
+        }
+
+        public static IPluginConfig[] GetPluginSettings()
+        {
+            List<IPluginConfig> types = new List<IPluginConfig>();
+            foreach (var plugin in PluginManager.LoadPlugins(true))
+                if (plugin.PluginSettingsUI != null)
+                    types.Add(plugin.PluginSettingsUI);
 
             return types.ToArray();
         }
