@@ -33,8 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="IONET">
-      <HintPath>..\Track Studio\Lib\IONET.dll</HintPath>
-      <CopyLocal>False</CopyLocal>
+      <HintPath>lib\IONET.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK">
       <HintPath>..\Track Studio\Lib\OpenTK.dll</HintPath>
