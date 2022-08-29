@@ -189,7 +189,7 @@ namespace Toolbox.Core
             if (settings.Orientation == Orientation.Transpose)
                 return Output;
             else
-                return FlipVertical(Width, Height, Output);
+                return Output;
         }
 
         private static void DecodeFormat(byte[] Output, byte[] Input, int OOffet, int IOffset, PICASurfaceFormat picaFormat)
