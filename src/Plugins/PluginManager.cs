@@ -46,6 +46,9 @@ namespace Toolbox.Core
            // PluginList.Add(mainLibrary);
 
             string path = Path.Combine(Runtime.ExecutableDir, "Plugins");
+            //Case sensitive checks incase the output path is slightly named differently
+            if (Directory.Exists(Path.Combine(Runtime.ExecutableDir, "plugins")))
+                path = Path.Combine(Runtime.ExecutableDir, "plugins");
 
             List<string> dllFileNames = new List<string>();
             dllFileNames.Add(Path.Combine(Runtime.ExecutableDir, "Toolbox.Core.dll"));
