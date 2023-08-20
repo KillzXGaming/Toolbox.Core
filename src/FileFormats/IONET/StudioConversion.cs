@@ -210,7 +210,9 @@ namespace IONET.Helpers
 
                     if (daeMat.DiffuseMap != null)
                     {
-                        string name = name = System.IO.Path.GetFileNameWithoutExtension(daeMat.DiffuseMap.FilePath);
+                        string name = daeMat.DiffuseMap.Name;
+                        if (name == null)
+                            name = System.IO.Path.GetFileNameWithoutExtension(daeMat.DiffuseMap.FilePath);
 
                         mat.TextureMaps.Add(new STGenericTextureMap()
                         {

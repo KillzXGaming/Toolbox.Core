@@ -42,11 +42,10 @@ namespace Toolbox.Core.Imaging
                 uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(height, blkHeight));
                 BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length ;
 
-                if (OutputFormat != TexFormat.ASTC_8x5_UNORM)
+                if (OutputFormat != TexFormat.ASTC_8x5_UNORM && OutputFormat != TexFormat.ASTC_8x5_SRGB)
                     BlockHeightLog2 -= 1;
             }
-
-            return TegraX1Swizzle.GetImageData(OutputFormat, width, height, arrayCount, mipCount, 1, data, array, mip, 0, BlockHeightLog2, Target, LinearMode);
+            return TegraX1Swizzle.GetImageDataDirect(OutputFormat, width, height, data, BlockHeightLog2, Target, LinearMode);
         }
 
         public byte[] EncodeImage(byte[] data, uint width, uint height, uint arrayCount, uint mipCount, int array, int mip) {

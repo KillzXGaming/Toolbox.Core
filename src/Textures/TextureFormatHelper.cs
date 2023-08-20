@@ -86,6 +86,8 @@ namespace Toolbox.Core
             { "RGBB10A2",  new FormatInfo(4, 1,  1, 1, TargetBuffer.Color) },
             { "RG11B10",   new FormatInfo(4, 1,  1, 1, TargetBuffer.Color) },
 
+            { "RGB9E5_SHAREDEXP",   new FormatInfo(4, 1,  1, 1, TargetBuffer.Color) },
+
             { "BGRA4",     new FormatInfo(2, 1,  1, 1, TargetBuffer.Color) },
             { "B5G6R5",    new FormatInfo(2, 1,  1, 1, TargetBuffer.Color) },
 

@@ -193,5 +193,14 @@ namespace Toolbox.Core
 
             return null;
         }
+
+        public STBone SearchBoneSuffix(string name)
+        {
+            for (int i = 0; i < Bones.Count; i++)
+                if (Bones[i].Name.EndsWith(name))
+                    return Bones[i];
+
+            return null;
+        }
     }
 }

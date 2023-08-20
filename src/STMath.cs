@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BrawlLib.Modeling.Triangle_Converter;
 using OpenTK;
 
 namespace Toolbox.Core
@@ -39,6 +40,11 @@ namespace Toolbox.Core
                 : asKb > 1 ? string.Format("{0} KB", asKb)
                 : string.Format("{0} bytes", Math.Round((double)value, decimalPlaces));
             return chosenValue;
+        }
+
+        public static float Lerp(float a, float b, float weight)
+        {
+            return (float)(a * (1 - weight) + b * weight);
         }
 
         //From https://github.com/Ploaj/SSBHLib/blob/e37b0d83cd088090f7802be19b1d05ec998f2b6a/CrossMod/Tools/CrossMath.cs#L42
@@ -90,6 +96,23 @@ namespace Toolbox.Core
             var axis = Vector3.Cross(start, end).Normalized();
             var angle = (float)Math.Acos(Vector3.Dot(start, end));
             return Matrix4.CreateFromAxisAngle(axis, angle);
+        }
+
+        public static Vector3 CreateDirectionEuler(float pitch, float yaw)
+        {
+            Vector3 dir = new Vector3();
+            dir.X = MathF.Cos(pitch) * MathF.Cos(yaw);
+            dir.Y = MathF.Sin(pitch);
+            dir.Z = MathF.Cos(pitch) * MathF.Sin(yaw);
+            return dir;
+        }
+
+        public static Vector3 EulerRotationFromTo(Vector3 start, Vector3 end)
+        {
+            var axis = Vector3.Cross(start, end).Normalized();
+            var angle = (float)Math.Acos(Vector3.Dot(start, end));
+
+            return axis * angle;
         }
 
         public static Quaternion QuatRotationFromTo(Vector3 start, Vector3 end)

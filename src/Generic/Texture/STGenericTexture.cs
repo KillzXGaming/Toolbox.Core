@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Drawing;
 using Toolbox.Core.Imaging;
 using Toolbox.Core.Switch;
+using IONET.Collada.FX.Texturing;
+using System.IO;
 
 namespace Toolbox.Core
 {
@@ -249,6 +251,25 @@ namespace Toolbox.Core
             }
         }
 
+        public void SaveASTC(string filePath, TextureExportSettings settings = null)
+        {
+            List<Surface> surfaces = GetSurfaces(settings.ArrayLevel, false);
+
+            ASTC atsc = new ASTC();
+            atsc.Width = Width;
+            atsc.Height = Height;
+            atsc.Depth = Depth;
+            atsc.BlockDimX = (byte)GetBlockWidth();
+            atsc.BlockDimY = (byte)GetBlockHeight();
+            atsc.BlockDimZ = (byte)GetBlockDepth();
+            atsc.DataBlock = ByteUtils.CombineArray(surfaces[0].mipmaps.ToArray());
+
+            using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite))
+            {
+                atsc.Save(fs);
+            }
+        }
+
         public void SaveBitmap(string filePath, TextureExportSettings settings = null)
         {
             var bitmap = GetBitmap(settings.ArrayLevel, settings.MipLevel);
@@ -351,8 +372,8 @@ namespace Toolbox.Core
             uint width = Math.Max(1, Width >> MipLevel);
             uint height = Math.Max(1, Height >> MipLevel);
             byte[] data = GetImageData(ArrayLevel, MipLevel, DepthLevel);
-            if (!IsBCNCompressed() && !Parameters.DontSwapRG)
-                data = ImageUtility.ConvertBgraToRgba(data);
+            //if (!IsBCNCompressed() && !Parameters.DontSwapRG)
+              //  data = ImageUtility.ConvertBgraToRgba(data);
             return Platform.DecodeImage(data, Width, Height, ArrayCount, MipCount, ArrayLevel, MipLevel);
         }
 

@@ -76,6 +76,21 @@ namespace Toolbox.Core.Switch
             return GetImageData(format, width, height, arrayCount, mipCount, 1, ImageData, ArrayLevel, MipLevel, DepthLevel, BlockHeightLog2, target, LinearTileMode);
         }
 
+        public static byte[] GetImageDataDirect(TexFormat format, uint width, uint height, Span<byte> ImageData, int target = 1, bool LinearTileMode = false)
+        {
+            uint blkHeight = TextureFormatHelper.GetBlockHeight(format);
+            uint blkDepth = TextureFormatHelper.GetBlockDepth(format);
+            uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(height, blkHeight));
+            uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
+
+            return GetImageData(format, width, height, 1, 1, 1, ImageData, 0, 0, 0, BlockHeightLog2, target, LinearTileMode);
+        }
+
+        public static byte[] GetImageDataDirect(TexFormat format, uint width, uint height, Span<byte> ImageData, uint BlockHeightLog2, int target = 1, bool LinearTileMode = false)
+        {
+            return GetImageData(format, width, height, 1, 1, 1, ImageData, 0, 0, 0, BlockHeightLog2, target, LinearTileMode);
+        }
+
         public static byte[] GetImageData(TexFormat format, uint texwidth, uint texheight, uint arrayCount, uint mipCount, uint texdepth, Span<byte> ImageData,
             int ArrayLevel, int MipLevel, int DepthLevel, uint BlockHeightLog2, int target = 1, bool LinearTileMode = false)
         {
