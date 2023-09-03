@@ -35,6 +35,11 @@ namespace Toolbox.Core.Animations
         /// </summary>
         public bool HasKeys => KeyFrames.Count > 0;
 
+        /// <summary>
+        /// The starting frame to play the track.
+        /// </summary>
+        public float StartFrame = 0.0f;
+
         public EventHandler OnKeyInserted;
 
         public virtual int ChannelIndex { get; set; }
@@ -197,14 +202,14 @@ namespace Toolbox.Core.Animations
         /// <param name="frame"></param>
         /// <param name="startFrame"></param>
         /// <returns></returns>
-        public virtual float GetFrameValue(float frame, float startFrame = 0)
+        public virtual float GetFrameValue(float frame)
         {
             if (KeyFrames.Count == 0) return 0;
             if (KeyFrames.Count == 1) return KeyFrames[0].Value;
             STKeyFrame LK = KeyFrames.First();
             STKeyFrame RK = KeyFrames.Last();
 
-            float Frame = GetWrapFrame(frame - startFrame);
+            float Frame = GetWrapFrame(frame - this.StartFrame);
             foreach (STKeyFrame keyFrame in KeyFrames)
             {
                 if (keyFrame.Frame <= Frame) LK = keyFrame;
