@@ -6,7 +6,7 @@ using System.Linq;
 namespace Toolbox.Core
 {
     public class FileManager
-    {
+    {        
         public static ICompressionFormat[] GetCompressionFormats()
         {
             List<ICompressionFormat> types = new List<ICompressionFormat>();
@@ -15,11 +15,11 @@ namespace Toolbox.Core
 
             return types.ToArray();
         }
-
+        
         public static IFileFormat[] GetFileFormats()
         {
             List<IFileFormat> types = new List<IFileFormat>();
-            foreach (var plugin in PluginManager.LoadPlugins(true))
+            foreach (var plugin in PluginManager.LoadPlugins())
                 types.AddRange(plugin.FileFormats);
 
             return types.ToArray();
@@ -73,7 +73,7 @@ namespace Toolbox.Core
         public static IPluginConfig[] GetPluginSettings()
         {
             List<IPluginConfig> types = new List<IPluginConfig>();
-            foreach (var plugin in PluginManager.LoadPlugins(true))
+            foreach (var plugin in PluginManager.LoadPlugins())
                 if (plugin.PluginSettingsUI != null)
                     types.Add(plugin.PluginSettingsUI);
 

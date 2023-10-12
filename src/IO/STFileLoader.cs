@@ -119,14 +119,15 @@ namespace Toolbox.Core.IO
             info.ParentArchive = settings.ParentArchive;
 
             stream.Position = streamStartPos;
-            foreach (IFileFormat fileFormat in FileManager.GetFileFormats())
+            foreach (IFileFormat fileFormatPlugin in FileManager.GetFileFormats())
             {
                 //Set the file name so we can check it's extension in the identifier. 
                 //Most is by magic but some can be extension or name.
 
                 stream.Position = streamStartPos;
-                if (fileFormat.Identify(info, stream) && !IsFileFiltered(fileFormat, settings))
+                if (fileFormatPlugin.Identify(info, stream) && !IsFileFiltered(fileFormatPlugin, settings))
                 {
+                    var fileFormat = (IFileFormat)Activator.CreateInstance(fileFormatPlugin.GetType());
                     fileFormat.FileInfo = info;
                     fileFormat.FileInfo.Stream = stream;
 
