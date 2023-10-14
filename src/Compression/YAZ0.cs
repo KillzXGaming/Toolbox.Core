@@ -2,6 +2,9 @@
 using Syroot.BinaryData;
 using System;
 using System.Runtime.InteropServices;
+using BrresTool;
+using System.Runtime.InteropServices.ComTypes;
+using static Toolbox.Core.Yaz0;
 
 namespace Toolbox.Core.IO
 {
@@ -18,6 +21,24 @@ namespace Toolbox.Core.IO
         public static unsafe byte[] Compress(string FileName, int level = 3, UInt32 res1 = 0, UInt32 res2 = 0) => Compress(File.ReadAllBytes(FileName), level, res1, res2);
         public static unsafe byte[] Compress(byte[] Data, int level = 3, UInt32 reserved1 = 0, UInt32 reserved2 = 0)
         {
+            if (szs.CanUse())
+            {
+                var algo = szs.CompressionAlgorithm.MK8;
+                switch (Quality)
+                {
+                    case QualityLevel.Default: algo = szs.CompressionAlgorithm.MK8; break;
+                 //   case QualityLevel.MkwSP: algo = szs.CompressionAlgorithm.MkwSP; break;
+                //    case QualityLevel.Haroohie: algo = szs.CompressionAlgorithm.Haroohie; break;
+                    case QualityLevel.CTlib: algo = szs.CompressionAlgorithm.CTlib; break;
+                    case QualityLevel.Best: algo = szs.CompressionAlgorithm.LibYaz0; break;
+                    case QualityLevel.Nintendo: algo = szs.CompressionAlgorithm.Nintendo; break;
+                }
+                return szs.Encode(Data, algo, (uint)reserved1);
+            }
+
+            if (Yaz0_Oead.CanUse())
+                return Yaz0_Oead.Compress(Data, (uint)reserved1, level);
+
             int maxBackLevel = (int)(0x10e0 * (level / 9.0) - 0x0e0);
 
             byte* dataptr = (byte*)Marshal.UnsafeAddrOfPinnedArrayElement(Data, 0);

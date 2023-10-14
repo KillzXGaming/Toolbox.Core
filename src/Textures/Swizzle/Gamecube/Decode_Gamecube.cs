@@ -934,6 +934,27 @@ namespace Toolbox.Core
         }
 
         #region Encoding
+
+        public static Tuple<List<byte[]>, ushort[]> EncodeMipData(List<byte[]> mipmaps, uint TexWidth, uint TexHeight, TextureFormats Format, PaletteFormats PaletteFormat)
+        {
+            ushort[] paletteData = new ushort[0];
+
+            List<byte[]> encoded = new List<byte[]>();
+            for (int mipLevel = 0; mipLevel < mipmaps.Count; mipLevel++)
+            {
+                int MipWidth = Math.Max(1, (int)TexWidth >> mipLevel);
+                int MipHeight = Math.Max(1, (int)TexHeight >> mipLevel);
+                var EncodedData = EncodeData(mipmaps[mipLevel], Format, PaletteFormat, MipWidth, MipHeight);
+
+                mipmaps.Add(EncodedData.Item1);
+
+                if (mipLevel == 0) //Set palette data once
+                    paletteData = EncodedData.Item2;
+            }
+
+            return Tuple.Create(encoded, paletteData);
+        }
+
         public static Tuple<byte[], ushort[]> EncodeData(byte[] m_rgbaImageData, TextureFormats Format, PaletteFormats PaletteFormat, int Width, int Height)
         {
             switch (Format)
