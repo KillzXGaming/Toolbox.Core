@@ -119,8 +119,24 @@ namespace Toolbox.Core.ViewModels
                     _isSelected = value;
                     RaisePropertyChanged("IsSelected");
                     OnSelected?.Invoke(this, EventArgs.Empty);
+
+                    if (this.Parent != null)
+                        this.Parent.PropagateSelectToParent();
                 }
             }
+        }
+
+        public EventHandler OnChildrenSelected;
+
+        public virtual void PropagateSelectToParent(int level = 0)
+        {
+            //hardcode the amount of tree searches for performance purposes
+            if (level > 5)
+                return;
+
+            OnChildrenSelected?.Invoke(this, EventArgs.Empty);
+            if (this.Parent != null)
+                this.Parent.PropagateSelectToParent(level++);
         }
 
         /// <summary>
