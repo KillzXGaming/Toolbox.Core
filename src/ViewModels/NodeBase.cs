@@ -120,7 +120,7 @@ namespace Toolbox.Core.ViewModels
                     RaisePropertyChanged("IsSelected");
                     OnSelected?.Invoke(this, EventArgs.Empty);
 
-                    if (this.Parent != null)
+                    if (this.Parent != null && _isSelected)
                         this.Parent.PropagateSelectToParent();
                 }
             }
