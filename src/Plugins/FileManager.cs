@@ -13,7 +13,7 @@ namespace Toolbox.Core
             foreach (var plugin in PluginManager.LoadPlugins())
                 types.AddRange(plugin.CompressionFormats);
 
-            return types.ToArray();
+            return types.OrderBy(type => type.Priority).ToArray();
         }
         
         public static IFileFormat[] GetFileFormats()
@@ -22,7 +22,7 @@ namespace Toolbox.Core
             foreach (var plugin in PluginManager.LoadPlugins())
                 types.AddRange(plugin.FileFormats);
 
-            return types.ToArray();
+            return types.OrderBy(type => type.Priority).ToArray();
         }
 
         public static IImportableTexture[] GetImportableTextures()
