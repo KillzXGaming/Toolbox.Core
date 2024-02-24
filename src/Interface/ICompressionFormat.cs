@@ -16,6 +16,8 @@ namespace Toolbox.Core
 
         bool CanCompress { get; }
 
+        int Priority { get { return 0; } }
+
         bool Identify(Stream stream, string fileName);
 
         Stream Decompress(Stream stream);

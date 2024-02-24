@@ -18,6 +18,8 @@ namespace Toolbox.Core
         /// </summary>
         bool CanSave { get; set; }
 
+        int Priority { get { return 0; } }
+
         /// <summary>
         /// Information of the loaded file.
         /// </summary>
