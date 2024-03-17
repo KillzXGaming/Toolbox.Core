@@ -54,7 +54,7 @@ namespace Toolbox.Core
         {
             var level = Math.Min(Math.Max(Runtime.Yaz0CompressionLevel, 6), 9);
 
-            if (szs.CanUse())
+            if (szs.CanUse() && Quality != QualityLevel.TrackStudioOriginal)
             {
                 var algo = szs.CompressionAlgorithm.MK8;
                 switch (Quality)
@@ -64,7 +64,7 @@ namespace Toolbox.Core
                   //  case QualityLevel.Haroohie: algo = szs.CompressionAlgorithm.Haroohie; break;
                     case QualityLevel.CTlib: algo = szs.CompressionAlgorithm.CTlib; break;
                     case QualityLevel.Best: algo = szs.CompressionAlgorithm.LibYaz0; break;
-                    case QualityLevel.Nintendo: algo = szs.CompressionAlgorithm.Nintendo; break;
+                    case QualityLevel.NintendoWii: algo = szs.CompressionAlgorithm.Nintendo; break;
                 }
                 return new MemoryStream(szs.Encode(stream.ReadAllBytes(), algo, (uint)Alignment));
             }
@@ -90,9 +90,10 @@ namespace Toolbox.Core
         public enum QualityLevel
         {
             Default,
+            TrackStudioOriginal,
             CTlib,
             Best,
-            Nintendo,
+            NintendoWii,
         }
 
         public static unsafe byte[] Compress(byte[] src, byte opt_compr)
