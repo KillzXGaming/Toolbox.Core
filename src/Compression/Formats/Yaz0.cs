@@ -54,7 +54,7 @@ namespace Toolbox.Core
         {
             var level = Math.Min(Math.Max(Runtime.Yaz0CompressionLevel, 6), 9);
 
-            if (szs.CanUse() && Quality != QualityLevel.TrackStudioOriginal)
+            if (szs.CanUse() && Quality != QualityLevel.TrackStudio)
             {
                 var algo = szs.CompressionAlgorithm.MK8;
                 switch (Quality)
@@ -90,7 +90,7 @@ namespace Toolbox.Core
         public enum QualityLevel
         {
             Default,
-            TrackStudioOriginal,
+            TrackStudio,
             CTlib,
             Best,
             NintendoWii,
