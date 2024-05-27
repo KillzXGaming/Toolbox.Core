@@ -338,12 +338,6 @@ namespace Toolbox.Core
             else if (Platform is DefaultSwizzle || Platform is SwitchSwizzle || Platform is WiiUSwizzle)
                 data = ImageUtility.ConvertBgraToRgba(data); //Swap Red/Blue channels
 
-            //Adjust BCN textures with improper pow2 sizes
-            if (IsBCNCompressed())
-            {
-                width = ((width + 3) / 4) * 4;
-                height = ((height + 3) / 4) * 4;
-            }
             //Create a new bitmap image from RGBA data and the width/height
             return BitmapExtension.CreateBitmap(data, (int)width, (int)height);
         }

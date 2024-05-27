@@ -37,5 +37,7 @@ namespace Toolbox.Core
         public bool UseSegmentScaleCompensate { get; set; }
 
         public bool WorldTransform { get; set; } = false;
+
+        public bool Visible { get; set; } = true;
     }
 }
