@@ -335,8 +335,8 @@ namespace Toolbox.Core
             //Decompress the compressed/encoded data if not RGBA
             if (Platform.OutputFormat != TexFormat.RGBA8_UNORM)
                 data = DecodeBlock(data, width, height, Platform.OutputFormat);
-            else if (Platform is DefaultSwizzle || Platform is SwitchSwizzle || Platform is WiiUSwizzle)
-                data = ImageUtility.ConvertBgraToRgba(data); //Swap Red/Blue channels
+
+            data = ImageUtility.ConvertBgraToRgba(data); //Swap Red/Blue channels
 
             //Create a new bitmap image from RGBA data and the width/height
             return Image.LoadPixelData<Rgba32>(data, (int)width, (int)height);

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using OpenTK;
+using System.Collections.Generic;
 
 namespace Toolbox.Core.IO
 {
@@ -88,10 +89,20 @@ namespace Toolbox.Core.IO
         }
 
         public void WriteStruct<T>(T item) => Write(item.StructToBytes(ByteOrder == ByteOrder.BigEndian));
-
+        public void WriteMultiStruct<T>(List<T> list)
+        {
+            foreach (T item in list)
+                Write(item.StructToBytes(ByteOrder == ByteOrder.BigEndian));
+        }
         public void WriteSignature(string value)
         {
             Write(Encoding.ASCII.GetBytes(value));
+        }
+
+        public void WriteStrings(List<string> values, Encoding encoding = null)
+        {
+            foreach (var value in values)
+                Write(value, BinaryStringFormat.ZeroTerminated, encoding ?? Encoding);
         }
 
         public void WriteString(string value, Encoding encoding = null)
