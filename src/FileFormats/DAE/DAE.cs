@@ -7,6 +7,7 @@ using Toolbox.Core.IO;
 using Collada141;
 using System.IO;
 using Toolbox.Core.Animations;
+using SixLabors.ImageSharp;
 
 namespace Toolbox.Core.Collada
 {
@@ -153,9 +154,9 @@ namespace Toolbox.Core.Collada
                                     }
 
                                     if (settings.ImageFolder != "")
-                                        bitmap.Save($"{settings.ImageFolder}/{textureName}.png");
+                                        bitmap.SaveAsPng($"{settings.ImageFolder}/{textureName}.png");
                                     else
-                                        bitmap.Save($"{textureName}.png");
+                                        bitmap.SaveAsPng($"{textureName}.png");
                                     bitmap.Dispose();
 
                                     GC.Collect();

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
 using Toolbox.Core.Imaging;
 using Toolbox.Core.Switch;
-using IONET.Collada.FX.Texturing;
 using System.IO;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Toolbox.Core
 {
@@ -321,7 +321,7 @@ namespace Toolbox.Core
         /// <param name="ArrayIndex">The index of the surface/array. Cubemaps will have 6</param>
         /// <param name="MipLevel">The index of the mip level.</param>
         /// <returns></returns>
-        public Bitmap GetBitmap(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0)
+        public Image<Rgba32> GetBitmap(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0)
         {
             //Get the mip width and height on the current mip level
             uint width = Math.Max(1, Width >> MipLevel);
@@ -335,11 +335,11 @@ namespace Toolbox.Core
             //Decompress the compressed/encoded data if not RGBA
             if (Platform.OutputFormat != TexFormat.RGBA8_UNORM)
                 data = DecodeBlock(data, width, height, Platform.OutputFormat);
-            else if (Platform is DefaultSwizzle || Platform is SwitchSwizzle || Platform is WiiUSwizzle)
-                data = ImageUtility.ConvertBgraToRgba(data); //Swap Red/Blue channels
+
+            data = ImageUtility.ConvertBgraToRgba(data); //Swap Red/Blue channels
 
             //Create a new bitmap image from RGBA data and the width/height
-            return BitmapExtension.CreateBitmap(data, (int)width, (int)height);
+            return Image.LoadPixelData<Rgba32>(data, (int)width, (int)height);
         }
 
         public byte[] GetDecodedSurface(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0)

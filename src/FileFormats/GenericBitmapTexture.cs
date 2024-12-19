@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using Toolbox.Core.Imaging;
 using System.IO;
+using SixLabors.ImageSharp;
 
 namespace Toolbox.Core
 {
@@ -130,7 +131,7 @@ namespace Toolbox.Core
             {
                 var image = texture.GetBitmap(i);
                 string ext = Path.GetExtension(filePath);
-                image.Save(numSurfaces == 1 ? filePath : $"{filePath}_{i}{ext}");
+                image.SaveAsPng(numSurfaces == 1 ? filePath : $"{filePath}_{i}{ext}");
             }
         }
 

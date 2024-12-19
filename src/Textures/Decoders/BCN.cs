@@ -5,7 +5,7 @@ using Toolbox.Core.TextureDecoding;
 
 namespace Toolbox.Core.Imaging
 {
-    public class BCN : ITextureDecoder
+    public class BCN 
     {
         public bool CanEncode(TexFormat format)
         {
