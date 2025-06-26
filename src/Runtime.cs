@@ -9,6 +9,8 @@ namespace Toolbox.Core
     {
         public static bool IsPlatformWindows = true;
 
+        public static float ResolutionScale = 1.0f;
+
         /// <summary>
         /// Enable or disable vsync used in 3D and 2D editors.
         /// </summary>
