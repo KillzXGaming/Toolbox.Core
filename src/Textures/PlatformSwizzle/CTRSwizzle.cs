@@ -27,7 +27,7 @@ namespace Toolbox.Core.Imaging
 
             try
             {
-                return ImageUtility.ConvertBgraToRgba(CTR_3DS.DecodeBlock(data, (int)width, (int)height, Format, settings));
+                return CTR_3DS.DecodeBlock(data, (int)width, (int)height, Format, settings);
             }
             catch
             {
