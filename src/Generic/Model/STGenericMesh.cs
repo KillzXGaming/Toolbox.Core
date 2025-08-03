@@ -428,7 +428,7 @@ namespace Toolbox.Core
                 t2 = v3.TexCoords[uvSet].Y - v1.TexCoords[uvSet].Y;
 
                 float div = (s1 * t2 - s2 * t1);
-                float r = 1.0f / div;
+                float r = 1.0f / -MathF.Abs(div);
 
                 // Fix +/- infinity from division by 0.
                 if (r == float.PositiveInfinity || r == float.NegativeInfinity)
