@@ -13,12 +13,12 @@ namespace Toolbox.Core
         /// <summary>
         /// The path the file is located at.
         /// </summary>
-        public string FilePath;
+        public string FilePath = "";
 
         /// <summary>
         /// The name of the file without the path.
         /// </summary>
-        public string FileName;
+        public string FileName = "";
 
         /// <summary>
         /// Keeps the stream open.
