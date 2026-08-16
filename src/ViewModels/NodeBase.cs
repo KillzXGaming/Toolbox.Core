@@ -61,6 +61,18 @@ namespace Toolbox.Core.ViewModels
             }
         }
 
+        /// <summary>
+        /// Aliases of the tree node, which are also valid search terms
+        /// </summary>
+        public List<string> Aliases { get; set; } = new List<string>();
+
+        public bool IsNameMatch(string searchText)
+        {
+            // Header name match, or alias match
+            return (Header != null && Header.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0)
+                || Aliases.Any(s => s.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
         private bool _hasCheckBox = false;
 
         /// <summary>
