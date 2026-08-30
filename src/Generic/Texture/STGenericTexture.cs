@@ -1,13 +1,15 @@
-﻿using System;
+﻿using IONET.Collada.FX.Custom_Types;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Toolbox.Core.Imaging;
 using Toolbox.Core.Switch;
-using System.IO;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace Toolbox.Core
 {
@@ -235,9 +237,19 @@ namespace Toolbox.Core
             {
               if (format.IdentifyExport(Utils.GetExtension(filePath))) {
                     format.Export(this, settings, filePath);
-                    break;
+                    return;
                 }
             }
+            // Save by image sharp by default
+            int numSurfaces = settings.ExportArrays ? (int)this.ArrayCount : 1;
+            if (numSurfaces == 0) numSurfaces = 1;
+            for (int i = 0; i < numSurfaces; i++)
+            {
+                string ext = Utils.GetExtension(filePath);
+                var image = this.GetBitmap(i);
+                image.Save(numSurfaces == 1 ? filePath : $"{filePath}_{i}{ext}");
+            }
+
         }
 
         public void Replace(string filePath)
