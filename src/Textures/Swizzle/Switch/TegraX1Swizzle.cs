@@ -66,33 +66,33 @@ namespace Toolbox.Core.Switch
         }
 
         public static byte[] GetImageData(TexFormat format, uint width, uint height, uint arrayCount, uint mipCount,
-            Span<byte> ImageData, int ArrayLevel, int MipLevel, int DepthLevel, int target = 1, bool LinearTileMode = false)
+            Span<byte> ImageData, int ArrayLevel, int MipLevel, int DepthLevel, int target = 1, bool LinearTileMode = false, bool isOrin = false)
         {
             uint blkHeight = TextureFormatHelper.GetBlockHeight(format);
             uint blkDepth = TextureFormatHelper.GetBlockDepth(format);
             uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(height, blkHeight));
             uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
 
-            return GetImageData(format, width, height, arrayCount, mipCount, 1, ImageData, ArrayLevel, MipLevel, DepthLevel, BlockHeightLog2, target, LinearTileMode);
+            return GetImageData(format, width, height, arrayCount, mipCount, 1, ImageData, ArrayLevel, MipLevel, DepthLevel, BlockHeightLog2, target, LinearTileMode, isOrin);
         }
 
-        public static byte[] GetImageDataDirect(TexFormat format, uint width, uint height, Span<byte> ImageData, int target = 1, bool LinearTileMode = false)
+        public static byte[] GetImageDataDirect(TexFormat format, uint width, uint height, Span<byte> ImageData, int target = 1, bool LinearTileMode = false, bool isOrin = false)
         {
             uint blkHeight = TextureFormatHelper.GetBlockHeight(format);
             uint blkDepth = TextureFormatHelper.GetBlockDepth(format);
             uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(height, blkHeight));
             uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
 
-            return GetImageData(format, width, height, 1, 1, 1, ImageData, 0, 0, 0, BlockHeightLog2, target, LinearTileMode);
+            return GetImageData(format, width, height, 1, 1, 1, ImageData, 0, 0, 0, BlockHeightLog2, target, LinearTileMode, isOrin);
         }
 
-        public static byte[] GetImageDataDirect(TexFormat format, uint width, uint height, Span<byte> ImageData, uint BlockHeightLog2, int target = 1, bool LinearTileMode = false)
+        public static byte[] GetImageDataDirect(TexFormat format, uint width, uint height, Span<byte> ImageData, uint BlockHeightLog2, int target = 1, bool LinearTileMode = false, bool isOrin = false)
         {
-            return GetImageData(format, width, height, 1, 1, 1, ImageData, 0, 0, 0, BlockHeightLog2, target, LinearTileMode);
+            return GetImageData(format, width, height, 1, 1, 1, ImageData, 0, 0, 0, BlockHeightLog2, target, LinearTileMode, isOrin);
         }
 
         public static byte[] GetImageData(TexFormat format, uint texwidth, uint texheight, uint arrayCount, uint mipCount, uint texdepth, Span<byte> ImageData,
-            int ArrayLevel, int MipLevel, int DepthLevel, uint BlockHeightLog2, int target = 1, bool LinearTileMode = false)
+            int ArrayLevel, int MipLevel, int DepthLevel, uint BlockHeightLog2, int target = 1, bool LinearTileMode = false, bool isOrin = false)
         {
             uint bpp = TextureFormatHelper.GetBytesPerPixel(format);
             uint blkWidth = TextureFormatHelper.GetBlockWidth(format);
@@ -153,7 +153,7 @@ namespace Toolbox.Core.Switch
                             Pitch = TegraX1Swizzle.round_up(width__ * bpp, 64);
                             SurfaceSize += Pitch * TegraX1Swizzle.round_up(height__, Math.Max(1, blockHeight >> blockHeightShift) * 8);
 
-                            Span<byte> result = TegraX1Swizzle.deswizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), data_);
+                            Span<byte> result = TegraX1Swizzle.deswizzle(width, height, depth, blkWidth, blkHeight, blkDepth, target, bpp, TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), data_, isOrin);
                             //Create a copy and use that to remove uneeded data
                             byte[] result_ = new byte[size];
                             Array.Copy(result.ToArray(), 0, result_, 0, size);
@@ -209,7 +209,7 @@ namespace Toolbox.Core.Switch
             return x + 1;
         }
 
-        private static Span<byte> _swizzle(uint width, uint height, uint depth, uint blkWidth, uint blkHeight, uint blkDepth, int roundPitch, uint bpp, uint tileMode, int blockHeightLog2, Span<byte> data, int toSwizzle)
+        private static Span<byte> _swizzle(uint width, uint height, uint depth, uint blkWidth, uint blkHeight, uint blkDepth, int roundPitch, uint bpp, uint tileMode, int blockHeightLog2, Span<byte> data, int toSwizzle, bool isOrin = false)
         {
             uint block_height = (uint)(1 << blockHeightLog2);
 
@@ -246,7 +246,7 @@ namespace Toolbox.Core.Switch
                     if (tileMode == 1)
                         pos = y * pitch + x * bpp;
                     else
-                        pos = getAddrBlockLinear(x, y, width, bpp, 0, block_height);
+                        pos = getAddrBlockLinear(x, y, width, bpp, 0, block_height, isOrin);
 
                     pos_ = (y * width + x) * bpp;
 
@@ -263,17 +263,17 @@ namespace Toolbox.Core.Switch
             return result;
         }
 
-        public static Span<byte> deswizzle(uint width, uint height, uint depth, uint blkWidth, uint blkHeight, uint blkDepth, int roundPitch, uint bpp, uint tileMode, int size_range, Span<byte> data)
+        public static Span<byte> deswizzle(uint width, uint height, uint depth, uint blkWidth, uint blkHeight, uint blkDepth, int roundPitch, uint bpp, uint tileMode, int size_range, Span<byte> data, bool isOrin = false)
         {
-            return _swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, roundPitch, bpp, tileMode, size_range, data, 0);
+            return _swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, roundPitch, bpp, tileMode, size_range, data, 0, isOrin);
         }
 
-        public static Span<byte> swizzle(uint width, uint height, uint depth, uint blkWidth, uint blkHeight, uint blkDepth, int roundPitch, uint bpp, uint tileMode, int size_range, Span<byte> data)
+        public static Span<byte> swizzle(uint width, uint height, uint depth, uint blkWidth, uint blkHeight, uint blkDepth, int roundPitch, uint bpp, uint tileMode, int size_range, Span<byte> data, bool isOrin = false)
         {
-            return _swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, roundPitch, bpp, tileMode, size_range, data, 1);
+            return _swizzle(width, height, depth, blkWidth, blkHeight, blkDepth, roundPitch, bpp, tileMode, size_range, data, 1, isOrin);
         }
 
-        static uint getAddrBlockLinear(uint x, uint y, uint width, uint bytes_per_pixel, uint base_address, uint block_height)
+        static uint getAddrBlockLinear(uint x, uint y, uint width, uint bytes_per_pixel, uint base_address, uint block_height, bool isOrin = false)
         {
             /*
               From Tega X1 TRM 
@@ -288,9 +288,19 @@ namespace Toolbox.Core.Switch
 
             x *= bytes_per_pixel;
 
-            uint Address = (GOB_address + ((x % 64) / 32) * 256 + ((y % 8) / 2) * 64
-                            + ((x % 32) / 16) * 32 + (y % 2) * 16 + (x % 16));
-            return Address;
+            uint gobOffset = isOrin ? GobOffsetOrin(x, y) : GobOffset(x, y);
+
+            return GOB_address + gobOffset;
+        }
+
+        static uint GobOffset(uint x, uint y)
+        {
+            return ((x % 64) / 32) * 256 + ((y % 8) / 2) * 64 + ((x % 32) / 16) * 32 + (y % 2) * 16 + (x % 16);
+        }
+
+        static uint GobOffsetOrin(uint x, uint y)
+        {
+            return ((x % 64) / 32) * 256 + ((y % 8) / 4) * 128 + ((x % 32) / 16) * 64 + (y % 4) * 16 + (x % 16);
         }
     }
 }

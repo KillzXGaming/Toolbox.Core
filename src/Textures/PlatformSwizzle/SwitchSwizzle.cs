@@ -23,6 +23,8 @@ namespace Toolbox.Core.Imaging
         //Quick check for linear tiling
         public bool LinearMode => TileMode == 1;
 
+        public bool IsOrin = false;
+
         public SwitchSwizzle(TexFormat format) {
             OutputFormat = format;
         }
@@ -45,7 +47,8 @@ namespace Toolbox.Core.Imaging
                 if (OutputFormat != TexFormat.ASTC_8x5_UNORM && OutputFormat != TexFormat.ASTC_8x5_SRGB)
                     BlockHeightLog2 -= 1;
             }
-            return TegraX1Swizzle.GetImageDataDirect(OutputFormat, width, height, data, BlockHeightLog2, Target, LinearMode);
+            return TegraX1Swizzle.GetImageDataDirect(OutputFormat, width, height, data, 
+                BlockHeightLog2, Target, LinearMode, IsOrin);
         }
 
         public byte[] EncodeImage(byte[] data, uint width, uint height, uint arrayCount, uint mipCount, int array, int mip) {
@@ -134,7 +137,10 @@ namespace Toolbox.Core.Imaging
                     SurfaceSize += Pitch * TegraX1Swizzle.round_up(height__, Math.Max(1, blockHeight >> blockHeightShift) * 8);
                 }
 
-                Span<byte> SwizzledData = TegraX1Swizzle.swizzle(width_, height_, depth_, blkWidth, blkHeight, blkDepth, target, bpp, (uint)TileMode, (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), data_);
+                Span<byte> SwizzledData = TegraX1Swizzle.swizzle(width_, height_, depth_,
+                    blkWidth, blkHeight, blkDepth, target, bpp, (uint)TileMode, 
+                    (int)Math.Max(0, BlockHeightLog2 - blockHeightShift), data_, IsOrin);
+
                 mipmaps.Add(AlignedData.Concat(SwizzledData.ToArray()).ToArray());
             }
             ImageSize = SurfaceSize;
